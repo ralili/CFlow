@@ -26,6 +26,7 @@ class click:
             self._mouseMvr.move(position)
             self._mouseMvr.click()
             self.counter=self.counter+1
+            self.delete_events(4,4)		#delete every for 4 seconds, 4 times. Delete the first 16 seconds of measurement.
             if self.checking_end_of_measurements()==1:
                 self.save()
             else:
@@ -151,6 +152,24 @@ class click:
         else:
             print('Experiment is done!!')
             return 1						#This indicates that experiment IS done. Close everything.
+    def delete_events(self,image_file="delete_events.png",frequency,repetitions):##Frequency is how many seconds to erase every time. Repetitions is how many times to erase
+        """Constructor"""
+        self._windowMgr.retake_screenshot()
+        try:
+            self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#Name of the button image
+        except IOError:
+            print('Image file not found. Quitting..')
+            return
+        if self._windowMgr._pos == None:
+            print('Could not delete events. Button not found on screen')
+        else:
+            for i in range(repetitions):
+                time.sleep(frequency)
+                position=(self._windowMgr._pos[0]+32,self._windowMgr._pos[1]+6) #add position offset
+                self._mouseMvr.move(position)
+                self._mouseMvr.click()
+                key.tap(key.K_RETURN)
+
 #    def set_led_times(self,day,hour,minute,frequency,num_samples):#frequency is in minutes
 #        self.measuring_times=[]
 #        time_today=datetime.datetime.now()
