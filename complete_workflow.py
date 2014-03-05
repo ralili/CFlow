@@ -41,7 +41,7 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
 
 def led_operation(day,hour,minute,frequency,operate_arduino_object)
   led=CFlow.led(operate_arduino_object)
-  led.read_intensity_file()
+  led.read_intensity_file()			##ADD FOLDER
   led.scale_intensities()
   led.set_change_times(day,hour,minute,frequency)
   led.guide()
