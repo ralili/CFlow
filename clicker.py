@@ -18,10 +18,9 @@ class click:
             self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#Name of the button image
         except IOError:
             print('Image file not found. Quitting..')
-            autopy.alert.alert('Image file not found. Quitting..')
             return
         if self._windowMgr._pos == None:
-            autopy.alert.alert('CFlow not ready to take measurements')
+            print('CFlow not ready to take measurements')
         else:
             position=(self._windowMgr._pos[0]+73,self._windowMgr._pos[1]+22)
             self._mouseMvr.move(position)
@@ -30,7 +29,7 @@ class click:
             if self.checking_end_of_measurements()==1:
                 self.save()
             else:
-                return 'stuff took too long. Quitting..'
+                return 'stuff took too long. Quitting..'				##ASK WHAT TO DO WHEN MEASUREMENT IS TAKING TOO LONG
     def sample(self,image_file="sample_button2.png"):
         """Constructor"""
         self._windowMgr.retake_screenshot()
@@ -38,10 +37,9 @@ class click:
             self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#Name of the button image
         except IOError:
             print('Image file not found. Quitting..')
-            autopy.alert.alert('Image file not found. Quitting..')
             return
         if self._windowMgr._pos == None:
-            autopy.alert.alert('CFlow not open, no button positions available')
+            print('CFlow not open, no button positions available')
         else:
             x_offset=(self.counter%12)*24
             y_offset=(self.counter/12)*24
@@ -75,10 +73,9 @@ class click:
             self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#Name of the button image
         except IOError:
             print('Image file not found. Quitting..')
-            autopy.alert.alert('Image file not found. Quitting..')
             return
         if self._windowMgr._pos == None:
-            autopy.alert.alert('Not ready to backflush')
+            print('Not ready to backflush')
         else:
             position=(self._windowMgr._pos[0]+32,self._windowMgr._pos[1]+24) #add position offset
             self._mouseMvr.move(position)
@@ -101,11 +98,10 @@ class click:
                 self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file_ready))	#Name of the button image
             except IOError:
                 print('Image file not found. Quitting..')
-                #autopy.alert.alert('Image file not found. Quitting..')
                 return
             if self._windowMgr._pos != None:
                 #print self._windowMgr._pos
-                #autopy.alert.alert('measurements done')
+                print('measurements done')
                 done=1
                 return 1
             else:
@@ -113,15 +109,13 @@ class click:
 #                    self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file_not_ready))	#Name of the button image
 #                except IOError:
 #                    print('Image file not found. Quitting..')
-#                    #autopy.alert.alert('Image file not found. Quitting..')
 #                    return
 #                if self._windowMgr._pos == None:
 #                    
 #                    
 #                    
-                if too_much_time>30:
+                if too_much_time>60:					##WHAT IS TOO MUCH TIME? OR WE DON'T CARE IF IT TAKES TOO MUCH TIME?
                     print('Measurement takes too much time. Quitting..')
-                    #autopy.alert.alert('Measurement takes too much time. Quitting..')
                     done=1
                     return 0
     def moveFiles(self,desktop_dir,destination_dir,CFlow_dir='FCS Exports'):
