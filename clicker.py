@@ -28,7 +28,7 @@ class click:
             self.counter=self.counter+1
             self.delete_events(4,4)			#delete every for 4 seconds, 4 times. Delete the first 16 seconds of measurement.
             if self.checking_end_of_measurements()==1:
-                self.add_sample_well_description()
+                self.add_sample_well_description() ##CHECK IF THIS INTERFERES WITH THE SAVING!
                 self.save()
             else:
                 self.pause_cytometer()
