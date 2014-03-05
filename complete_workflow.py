@@ -34,9 +34,10 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
     bring_sample(operate_arduino_object)
     click_object.sample()
     click_object.run()
-    click_object.backflush()
     click_object.export()
     click_object.moveFiles('C:\\Users\\rumarc\\Desktop','C:\\Users\\rumarc\\Desktop\\Results')###THIS CHANGES FROM COMPUTER TO COMPUTER. THE OUTPUT FOLDER MUST BE CREATED BEFOREHAND
+    ##PERFORM FEEDBACK
+    click_object.backflush()
     operate_arduino_object.cytometer_to_waste(7)
   return
 
