@@ -26,13 +26,15 @@ class click:
             self._mouseMvr.move(position)
             self._mouseMvr.click()
             self.counter=self.counter+1
-            self.delete_events(4,4)		#delete every for 4 seconds, 4 times. Delete the first 16 seconds of measurement.
+            self.delete_events(4,4)			#delete every for 4 seconds, 4 times. Delete the first 16 seconds of measurement.
             if self.checking_end_of_measurements()==1:
+                self.add_sample_well_description()
                 self.save()
             else:
                 self.pause_cytometer()
+                self.add_sample_well_description()
                 self.save()
-                return 'stuff took too long. Quitting..'				##When measurement takes more than 5minutes, pause operation and move on.
+                return						#When measurement takes more than 5minutes, pause operation and move on.
     def sample(self,image_file="sample_button2.png"):
         """Constructor"""
         self._windowMgr.retake_screenshot()
@@ -96,7 +98,7 @@ class click:
         while not done:
             too_much_time=too_much_time+1
             time.sleep(5)
-            self._windowMgr.retake_screenshot()			#This causes CFlow to maximize its window every 5seconds, which is kind of anoying. Maybe just check if it is maximized?
+            self._windowMgr.retake_screenshot()			##This causes CFlow to maximize its window every 5seconds, which is kind of annoying. Maybe just check if it is maximized?
             try:
                 self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file_ready))	#Name of the button image
             except IOError:
@@ -185,6 +187,23 @@ class click:
             position=(self._windowMgr._pos[0]+50,self._windowMgr._pos[1]+10) #add position offset
             self._mouseMvr.move(position)
             self._mouseMvr.click()
+    def add_sample_well_description(self,image_file="sample_well_description.png"):
+        """Constructor"""
+        self._windowMgr.retake_screenshot()
+        try:
+            self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#Name of the button image
+        except IOError:
+            print('Image file not found. Quitting..')
+            return
+        if self._windowMgr._pos == None:
+            print('Could not add sample well description. Button not found on screen')
+        else:
+            position=(self._windowMgr._pos[0]+80,self._windowMgr._pos[1]+8) #add position offset
+            self._mouseMvr.move(position)
+            self._mouseMvr.click()
+            sample_time=datetime.datetime.now()
+            sample_time=' '.join([str(sample_time.hour),str(sample_time.minute),str(sample_time.second)])
+            key.type_string(sample_time)
 
 #    def set_led_times(self,day,hour,minute,frequency,num_samples):#frequency is in minutes
 #        self.measuring_times=[]
