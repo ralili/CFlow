@@ -30,7 +30,9 @@ class click:
             if self.checking_end_of_measurements()==1:
                 self.save()
             else:
-                return 'stuff took too long. Quitting..'				##ASK WHAT TO DO WHEN MEASUREMENT IS TAKING TOO LONG
+                self.pause_cytometer()
+                self.save()
+                return 'stuff took too long. Quitting..'				##When measurement takes more than 5minutes, pause operation and move on.
     def sample(self,image_file="sample_button2.png"):
         """Constructor"""
         self._windowMgr.retake_screenshot()
@@ -115,7 +117,7 @@ class click:
 #                    
 #                    
 #                    
-                if too_much_time>60:					##WHAT IS TOO MUCH TIME? OR WE DON'T CARE IF IT TAKES TOO MUCH TIME?
+                if too_much_time>60:					#When cytometer takes more than 5 minutes, pause operation and move on.
                     print('Measurement takes too much time. Quitting..')
                     done=1
                     return 0
@@ -169,6 +171,20 @@ class click:
                 self._mouseMvr.move(position)
                 self._mouseMvr.click()
                 key.tap(key.K_RETURN)
+    def pause_cytometer(self,image_file="pause.png"):
+        """Constructor"""
+        self._windowMgr.retake_screenshot()
+        try:
+            self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#Name of the button image
+        except IOError:
+            print('Image file not found. Quitting..')
+            return
+        if self._windowMgr._pos == None:
+            print('Could not pause cytometer operation. Button not found on screen')
+        else:
+            position=(self._windowMgr._pos[0]+50,self._windowMgr._pos[1]+10) #add position offset
+            self._mouseMvr.move(position)
+            self._mouseMvr.click()
 
 #    def set_led_times(self,day,hour,minute,frequency,num_samples):#frequency is in minutes
 #        self.measuring_times=[]
