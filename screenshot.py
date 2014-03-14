@@ -23,7 +23,7 @@ class WindowMgr:				#Has methods to find CFlow window handler, maximize that win
             #print hwnd
         #print(win32process.GetWindowThreadProcessId(hwnd))
 
-    def find_window_wildcard(self, wildcard='C:\\\\Program Files \(x86\)\\\\CFlow'):
+    def find_window_wildcard(self, wildcard='C:\\\\Program Files\\\\BD Accuri'):###THIS CHANGES FROM COMPUTER TO COMPUTER.
         """search for window with wildcard in its title"""
         self._handle = None
         cmd = 'WMIC PROCESS get Caption,Commandline,Processid'
@@ -53,7 +53,10 @@ class WindowMgr:				#Has methods to find CFlow window handler, maximize that win
         self._pos = self._screenshot.find_bitmap(button)
     def retake_screenshot(self):
         """take screenshot again"""
-        self.maximize_window()
+#        self.maximize_window()
+        autopy.mouse.move(1,1)
+        autopy.mouse.move(0,0)
+        time.sleep(0.5)
         self._screenshot=autopy.bitmap.capture_screen()
     def maximize_window(self):
         """Maximize window given in the handler"""
