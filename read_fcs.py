@@ -50,16 +50,19 @@ class read_fcs:
 		self.mean_all = np.mean(self.YFP);
 	def print_results(self):
 		files = [ f for f in os.listdir(self.folder) if (os.path.isfile(os.path.join(self.folder,f)) and f[-4:]=='.fcs')]
-		self.results=[]
+		self.means=[]
+		self.medians=[]
 		for f in files:
 			self.extract_data(f)
 			self.gate()
 			self.normalize()
-			self.results.append(self.mean_all_fsc)
+			self.means.append(self.mean_all_fsc)
+			self.medians.append(self.median_all_fsc)
 		csvfile=open(os.path.join(self.folder,'results.csv'),'w+')
 		csvwriter = csv.writer(csvfile, dialect='excel')
 		csvwriter.writerow(files)
-		csvwriter.writerow(self.results)
+		csvwriter.writerow(self.means)
+		csvwriter.writerow(self.medians)
 		csvfile.close()
 
 
