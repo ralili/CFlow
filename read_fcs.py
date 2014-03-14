@@ -1,6 +1,7 @@
 from fcm import loadFCS
 import numpy as np
 import os
+import csv
 
 class read_fcs:
 	def __init__(self,folder='C:/Users/rumarc/Desktop/fcs_files',cell_type=None):
@@ -47,6 +48,19 @@ class read_fcs:
 		self.var_all_fsc= np.var(self.YFPnorm_fsc);
 		#self.var_all_ssc= np.var(YFPnorm_ssc);
 		self.mean_all = np.mean(self.YFP);
+	def print_results(self):
+		files = [ f for f in os.listdir(self.folder) if (os.path.isfile(os.path.join(self.folder,f)) and f[-4:]=='.fcs')]
+		self.results=[]
+		for f in files:
+			self.extract_data(f)
+			self.gate()
+			self.normalize()
+			self.results.append(self.mean_all_fsc)
+		file=open(os.path.join(self.folder,'results.csv'))
+		csvwriter = csv.writer(csvfile, dialect='excel')
+		csvwriter.writerow(self.results)
+		file.close()
+
 
 #available channels: ['FSC-A', 'SSC-A', 'FL1-A', 'FL2-A', 'FL3-A', 'FL4-A', 'FSC-H', 'SSC-H', 'FL1-H', 'FL2-H', 'FL3-H', 'FL4-H', 'Width', 'Time']
 
