@@ -151,8 +151,7 @@ class click:
         self.measuring_times=[]
         time_today=datetime.datetime.now()
         starting_time=datetime.datetime(time_today.year,time_today.month,day,hour,minute,second=0) #User input is only day,hour,minute,second
-        number_samples=num_samples
-        for i in range(number_samples):
+        for i in range(num_samples):
             self.measuring_times.append(starting_time+datetime.timedelta(minutes=frequency*i))
         print('The measuring times will be:')
         for i in range(len(self.measuring_times)):
