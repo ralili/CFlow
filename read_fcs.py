@@ -4,7 +4,7 @@ import os
 import csv
 
 class read_fcs:
-	def __init__(self,folder='C:/Users/rumarc/Desktop/fcs_files',cell_type=None):
+	def __init__(self,folder,cell_type=None):
 		self.folder=folder
 		self.cell_type=cell_type
 	def extract_data(self,file_name):
@@ -56,10 +56,11 @@ class read_fcs:
 			self.gate()
 			self.normalize()
 			self.results.append(self.mean_all_fsc)
-		file=open(os.path.join(self.folder,'results.csv'))
+		csvfile=open(os.path.join(self.folder,'results.csv'),'w+')
 		csvwriter = csv.writer(csvfile, dialect='excel')
+		csvwriter.writerow(files)
 		csvwriter.writerow(self.results)
-		file.close()
+		csvfile.close()
 
 
 #available channels: ['FSC-A', 'SSC-A', 'FL1-A', 'FL2-A', 'FL3-A', 'FL4-A', 'FSC-H', 'SSC-H', 'FL1-H', 'FL2-H', 'FL3-H', 'FL4-H', 'Width', 'Time']
