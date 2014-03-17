@@ -64,14 +64,14 @@ class read_fcs:
 		csvwriter.writerow(self.means)
 		csvwriter.writerow(self.medians)
 		csvfile.close()
-    def get_last_data(self,click_object):
+	def get_last_data(self,click_object):
 		last_sample=click_object.sample_counter-1
 		letter_list=['A','B','C','D','E','F','G','H']
 		letter=letter_list[(last_sample/12)]
 		number=last_sample%12+1
 		well_name=('%s%02d'%(letter,number))
 		file_name = [ f for f in os.listdir(self.folder) if (os.path.isfile(os.path.join(self.folder,f)) and f[0:3]==well_name)]
-		self.extract_data(filen_name)
+		self.extract_data(file_name[0])
 		self.gate()
 		self.normalize()
 		return self.mean_all_fsc
