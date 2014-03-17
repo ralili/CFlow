@@ -36,6 +36,7 @@ def bring_sample(operate_arduino_object):
 def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_object,starting_well=0):
   click_object=CFlow.click(sample_counter=starting_well)
   click_object.set_measuring_times(day,hour,minute,frequency,num_samples)		#Set input correctly. day,hour,minute,frequency,num_samples
+  read_fcs_object=CFlow.read_fcs('C:\\Users\\rumarc\\Desktop\\Results')
   while click_object.set_waiting_time()==0:
     time.sleep(click_object.waiting_time)
     print(click_object.waiting_time)
@@ -45,6 +46,10 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
     click_object.export()
     click_object.moveFiles('C:\\Users\\rumarc\\Desktop','C:\\Users\\rumarc\\Desktop\\Results')###THIS CHANGES FROM COMPUTER TO COMPUTER. THE OUTPUT FOLDER MUST BE CREATED BEFOREHAND
     ##PERFORM FEEDBACK
+    YFP_mean=read_fcs_object.get_last_data(click_object)
+    LED_signal=0.05*(YFP_mean-0.5)##SET REFERENCE, SET P PARAMETER
+    operate_arduino_object.operate_led(2,LED_signal)
+	##
     click_object.backflush()
     operate_arduino_object.cytometer_to_waste(8)
   return
