@@ -221,3 +221,8 @@ class click:
             sample_time=datetime.datetime.now()
             sample_time=''.join([str(sample_time.hour),'h',str(sample_time.minute),'m'])
             key.type_string(sample_time)
+    def get_filename(self):
+        letter_list=['A','B','C','D','E','F','G','H']
+        letter=letter_list[(click_object.sample_counter/12)]
+        number=click_object.sample_counter%12+1
+        return ('%s%02d'%(letter,number))
