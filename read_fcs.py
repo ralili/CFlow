@@ -15,7 +15,7 @@ class read_fcs:
 		self.SSC_A=[self.data[:,index] for index in range(len(self.data.channels)) if self.data.channels[index]=='SSC-A'][0]#extracts data of desired channel.
 		self.YFP=[self.data[:,index] for index in range(len(self.data.channels)) if self.data.channels[index]=='FL1-A'][0]#extracts data of desired channel.
 	def gate(self):
-		if self.cell_type=='yeast' or self.cell_type=='2':
+		if self.cell_type=='yeast' or self.cell_type==2:
 			M=np.matrix('6.3913 5.3564')
 			C = np.matrix('0.0392,0.0354;0.0354,0.0708')
 			C_inv=np.linalg.inv(C)
@@ -30,7 +30,7 @@ class read_fcs:
 			self.FSC_A=self.data[ingate,0]
 			self.SSC_A=self.data[ingate,1]
 			self.YFP=self.data[ingate,2]##FL1_A
-		elif self.cell_type=='ecoli' or self.cell_type=='1':
+		elif self.cell_type=='ecoli' or self.cell_type==1:
 			center = np.array([4.3,3.3])
 			ingate = (3*(np.log10(self.FSC_A)-center[0])**2+0.5*(np.log10(self.SSC_A)-center[1]))**2<0.1
 			ingate = ingate*(self.YFP>300)
