@@ -1,6 +1,6 @@
 import CFlow,time,threading,logging
 
-logging.basicConfig(filename='myapp.log', level=logging.INFO)
+logging.basicConfig(filename='CFlow_execution.log', level=logging.INFO)
 
 operate_arduino_object=CFlow.operate_arduino()
 
