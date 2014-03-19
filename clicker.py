@@ -153,9 +153,10 @@ class click:
         starting_time=datetime.datetime(time_today.year,time_today.month,day,hour,minute,second=0) #User input is only day,hour,minute,second
         for i in range(num_samples):
             self.measuring_times.append(starting_time+datetime.timedelta(minutes=frequency*i))
-        logging.info('The measuring times will be:')
-        for i in range(len(self.measuring_times)):
-            logging.info('\n %s \n',self.measuring_times[i])
+        measuring_times_string='\n'
+        for i in self.measuring_times:
+            measuring_times_string=measuring_times_string+'  '+str(i)+'\n'
+        logging.info('The measuring times will be: %s',measuring_times_string)
     def set_waiting_time(self):
         if len(self.measuring_times)>self.time_counter:
             self.waiting_time=(self.measuring_times[self.time_counter]-datetime.datetime.now()).total_seconds()
