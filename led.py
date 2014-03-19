@@ -1,4 +1,4 @@
-import datetime,time,os,csv
+import datetime,time,os,csv,logging
 class led:
 	def __init__(self,operate_arduino_object):
 		self.intensity=[]
@@ -14,10 +14,10 @@ class led:
 		self.number_rows=len(self.intensity)
 		self.number_columns=len(self.intensity[0])
 		if self.number_rows!=2:
-			print('Led intensities file does not have correct format. Unequal number of rows')
+			logging.warning('Led intensities file does not have correct format. Unequal number of rows')
 			return
 		if len(self.intensity[0])!=len(self.intensity[1]):
-			print('Led intensities file does not have correct format. Unequal number of columns')
+			logging.warning('Led intensities file does not have correct format. Unequal number of columns')
 			return
 	def scale_intensities(self):
 		for j in range(self.number_rows):
@@ -37,10 +37,10 @@ class led:
 		while len(self.intensity_change_times)>self.counter:
 			waiting_time=(self.intensity_change_times[self.counter]-datetime.datetime.now()).total_seconds()
 			if waiting_time<0:
-				print('timepoint %s already passed. Waiting for the next one'%(str(self.intensity_change_times[self.counter]))) #If timepoint has passed, wait for the next one (or should we just measure right away?)
+				logging.warning('timepoint %s already passed. Waiting for the next one'%(str(self.intensity_change_times[self.counter]))) #If timepoint has passed, wait for the next one (or should we just measure right away?)
 				self.counter=self.counter+1
 			else:
-				print(waiting_time)
+				#logging.info('Waiting time for led intensity change is: %d',waiting_time)
 				time.sleep(waiting_time)						#time to sleep to next change
 				self.operate_arduino_object.operate_led('led1',self.intensity[0][self.counter])
 				self.operate_arduino_object.operate_led('led2',self.intensity[1][self.counter])
@@ -48,5 +48,5 @@ class led:
 		time.sleep(self.frequency)
 		self.operate_arduino_object.operate_led('led1',0)
 		self.operate_arduino_object.operate_led('led2',0)
-		print('Experiment is done!!')
+		logging.info('all led intensity changes are done!!')
 		return												#This indicates that experiment IS done. Close everything.

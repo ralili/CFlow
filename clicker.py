@@ -1,4 +1,4 @@
-import CFlow,autopy,os,time,shutil,datetime
+import CFlow,autopy,os,time,shutil,datetime,logging
 from autopy import key
 
 class click:

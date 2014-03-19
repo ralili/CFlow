@@ -1,4 +1,4 @@
-import win32gui,win32con,win32process,autopy,time,re,subprocess
+import win32gui,win32con,win32process,autopy,time,re,subprocess,logging
 from autopy import bitmap,mouse
 
 ###screenshot_process_id
@@ -34,7 +34,7 @@ class WindowMgr:				#Has methods to find CFlow window handler, maximize that win
         regex=re.compile(wildcard)
         CFlow_process=[l for l in process_list for m in [regex.search(l)] if m]
         if len(CFlow_process)!=1:
-            print('error! Could not locate CFlow process correctly')
+            logging.warning('error! Could not locate CFlow process correctly')
         else:
             process_id=re.search('\s+(\d+)\s+',CFlow_process[0])
             self._process_id=int(process_id.group(1))
@@ -62,7 +62,7 @@ class WindowMgr:				#Has methods to find CFlow window handler, maximize that win
         """Maximize window given in the handler"""
         self.find_window_wildcard()								#This here could change sometime, and it would make the program fail. It corresponds to
         if not self._handle:									#the program's title on the menu bar.
-            print('CFlow not open! (no handle)')
+            logging.warning('CFlow not open! (no handle)')
             return
         self.set_foreground()
         time.sleep(0.5)

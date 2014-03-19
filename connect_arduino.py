@@ -1,13 +1,13 @@
 ## import the arduino Proto Api library
 from Arduino import Arduino
-import time #import the time library
+import time,logging #import the time library
 ## open the serial port that your arduino is connected to.
 class operate_arduino(Arduino):
 	def __init__(self,valve1=2,valve2=4,pump1D=8,pump1S=9,pump2D=12,pump2S=11,led1=5,led2=10,sensor='A05'):#the defaults are the pins that I assume will be connected to the valves
 		try:
 			Arduino.__init__(self) #connect to arduino REMOVE THE PORT!!
 		except ValueError:
-			print('Error! Arduino was not found')
+			logging.warning('Error! Arduino was not found')
 			return
 		self.valve1=valve1
 		self.valve2=valve2
