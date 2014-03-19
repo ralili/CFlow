@@ -38,6 +38,7 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
   click_object.set_measuring_times(day,hour,minute,frequency,num_samples)		#Set input correctly. day,hour,minute,frequency,num_samples
   read_fcs_object=CFlow.read_fcs('C:\\Users\\rumarc\\Desktop\\Results','ecoli')
   operate_arduino_object.operate_led(1,256)####
+  I=0
   while click_object.set_waiting_time()==0:
     time.sleep(click_object.waiting_time)
     print(click_object.waiting_time)
@@ -51,7 +52,9 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
     ##PERFORM FEEDBACK
     YFP_mean=read_fcs_object.get_last_data(click_object)
     print(YFP_mean)
-    LED_signal=0.8*(0.66-YFP_mean)##SET REFERENCE, SET P PARAMETER
+	I=0.08*(0.66-YFP_mean)+I
+    print(I)
+    LED_signal=0.8*(0.66-YFP_mean)+I##SET REFERENCE, SET P PARAMETER
     if LED_signal<0:
         LED_signal=0
     elif LED_signal>1:
