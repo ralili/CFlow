@@ -1,4 +1,6 @@
-import CFlow,time,threading
+import CFlow,time,threading,logging
+
+logging.basicConfig(filename='myapp.log', level=logging.INFO)
 
 operate_arduino_object=CFlow.operate_arduino()
 
@@ -38,10 +40,16 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
   click_object.set_measuring_times(day,hour,minute,frequency,num_samples)		#Set input correctly. day,hour,minute,frequency,num_samples
   read_fcs_object=CFlow.read_fcs('C:\\Users\\rumarc\\Desktop\\Results','ecoli')
   operate_arduino_object.operate_led(1,256)####
+  ##Feedback constants
   I=0
+  P=0
+  kp=0.8
+  ki=0.08
+  ref=0.66
+  ##
   while click_object.set_waiting_time()==0:
     time.sleep(click_object.waiting_time)
-    print(click_object.waiting_time)
+    logging.info('waiting time until next measurement is: %d',click_object.waiting_time)
     bring_sample(operate_arduino_object)
     click_object.sample()
     click_object.run()
@@ -51,15 +59,17 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
     time.sleep(1)
     ##PERFORM FEEDBACK
     YFP_mean=read_fcs_object.get_last_data(click_object)
-    print(YFP_mean)
-	I=0.08*(0.66-YFP_mean)+I
-    print(I)
-    LED_signal=0.8*(0.66-YFP_mean)+I##SET REFERENCE, SET P PARAMETER
+    logging.info('YFP mean is: %d',YFP_mean)
+    I=ki*(ref-YFP_mean)+I
+    logging.info('Integral parameter value is: %d',I)
+    P=kp*(ref-YFP_mean)
+    logging.info('Proportional parameter value is: %d',P)
+    LED_signal=P+I##SET REFERENCE, SET P PARAMETER
     if LED_signal<0:
         LED_signal=0
     elif LED_signal>1:
         LED_signal=1
-    print(LED_signal)
+    logging.info('LED signal is: %d',LED_signal)
     LED_signal=LED_signal*256
     operate_arduino_object.operate_led(2,LED_signal)
 	##
