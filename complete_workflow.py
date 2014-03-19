@@ -23,7 +23,7 @@ def bring_sample(operate_arduino_object):
   operate_arduino_object.cytometer_to_waste(3)#3
   operate_arduino_object.push_to_cytometer(2)#2
   operate_arduino_object.cytometer_to_waste(3)#3
-  operate_arduino_object.push_to_cytometer(1.1)##Critical time step. 2
+  operate_arduino_object.push_to_cytometer(0.9)##Critical time step. 2
   operate_arduino_object.push_to_cytometer(0)##0.3
   operate_arduino_object.cytometer_to_waste(7)#7
   operate_arduino_object.push_to_cytometer(1)##How much sample to introduce into cytometer. 1
@@ -36,7 +36,7 @@ def bring_sample(operate_arduino_object):
 def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_object,starting_well=0):
   click_object=CFlow.click(sample_counter=starting_well)
   click_object.set_measuring_times(day,hour,minute,frequency,num_samples)		#Set input correctly. day,hour,minute,frequency,num_samples
-  read_fcs_object=CFlow.read_fcs('C:\\Users\\rumarc\\Desktop\\Results')
+  read_fcs_object=CFlow.read_fcs('C:\\Users\\rumarc\\Desktop\\Results','ecoli')
   operate_arduino_object.operate_led(1,256)####
   while click_object.set_waiting_time()==0:
     time.sleep(click_object.waiting_time)
