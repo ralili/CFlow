@@ -17,10 +17,10 @@ class click:
         try:
             self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#path to the image
         except IOError:
-            print('Image file not found. Quitting..')
+            logging.warning('Image file not found. Quitting..')
             return
         if self._windowMgr._pos == None:
-            print('CFlow not ready to take measurements')
+            logging.warning('CFlow not ready to take measurements')
         else:
             position=(self._windowMgr._pos[0]+73,self._windowMgr._pos[1]+22)
             self._mouseMvr.move(position)
@@ -29,7 +29,7 @@ class click:
             self.sample_counter=self.sample_counter+1
             self.delete_events()			#delete every 2 seconds, 5 times. Delete the first 10 seconds of measurement.
             if self.checking_end_of_measurements()==1:
-                print('measurement %d done'%(self.time_counter))
+                logging.info('measurement %d done',self.time_counter)
                 self.add_sample_well_description()
                 self.save()
             else:
@@ -44,10 +44,10 @@ class click:
         try:
             self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#path to the image
         except IOError:
-            print('Image file not found. Quitting..')
+            logging.warning('Image file not found. Quitting..')
             return
         if self._windowMgr._pos == None:
-            print('CFlow not open, no button positions available')
+            logging.warning('CFlow not open, no button positions available')
         else:
             x_offset=(self.sample_counter%12)*24
             y_offset=(self.sample_counter/12)*24
@@ -86,10 +86,10 @@ class click:
         try:
             self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#path to the image
         except IOError:
-            print('Image file not found. Quitting..')
+            logging.warning('Image file not found. Quitting..')
             return
         if self._windowMgr._pos == None:
-            print('Not ready to backflush')
+            logging.warning('Not ready to backflush')
         else:
             position=(self._windowMgr._pos[0]+32,self._windowMgr._pos[1]+24) #add position offset
             self._mouseMvr.move(position)
@@ -111,7 +111,7 @@ class click:
             try:
                 self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file_ready))	#Name of the button image
             except IOError:
-                print('Image file not found. Quitting..')
+                logging.warning('Image file not found. Quitting..')
                 return
             if self._windowMgr._pos != None:
                 done=1
@@ -132,42 +132,42 @@ class click:
                     [shutil.copy2(os.path.join(automatic_CFlow_directory,name),destination_dir) for name in os.listdir(automatic_CFlow_directory)]	#move fcs files to new directory. If they are already present, they are replaced.
                     shutil.rmtree(automatic_CFlow_directory)																			#Remove the directory where the fcs files were. CHANGE TO SHUTIL.RMTREE()
                 else:
-                    print('Specified CFlow directory (where it exports) could not be found')
+                    logging.warning('Specified CFlow directory (where it exports) could not be found')
             elif self.export_counter!=1:
-                print('Error. No files found to export. Trying to export once more')
+                logging.warning('Error. No files found to export. Trying to export once more')
                 self._windowMgr.maximize_window()
                 self.export_counter=1
                 self.export()
                 time.sleep(2)
                 self.moveFiles(desktop_dir,destination_dir,CFlow_dir)
             else:
-                print('Error. Still no files found to export')
+                logging.warning('Error. Still no files found to export')
                 self.export_counter=0
 			#desktop_dir='C:\\Users\\rumarc\\Desktop'
 			#dir = os.path.join(desktop_dir,CFlow_dir)
         else:
-            print('specified paths for Desktop or Output could not be found')
+            logging.warning('specified paths for Desktop or Output could not be found')
     def set_measuring_times(self,day,hour,minute,frequency,num_samples):#frequency is in minutes
         self.measuring_times=[]
         time_today=datetime.datetime.now()
         starting_time=datetime.datetime(time_today.year,time_today.month,day,hour,minute,second=0) #User input is only day,hour,minute,second
         for i in range(num_samples):
             self.measuring_times.append(starting_time+datetime.timedelta(minutes=frequency*i))
-        print('The measuring times will be:')
+        logging.info('The measuring times will be:')
         for i in range(len(self.measuring_times)):
-            print ('\n %s \n'%(self.measuring_times[i]))
+            logging.info('\n %s \n',self.measuring_times[i])
     def set_waiting_time(self):
         if len(self.measuring_times)>self.time_counter:
             self.waiting_time=(self.measuring_times[self.time_counter]-datetime.datetime.now()).total_seconds()
             if self.waiting_time<0:
-                print('timepoint %s already passed. Waiting for the next one'%(str(self.measuring_times[self.time_counter]))) #If timepoint has passed, wait for the next one (or should we just measure right away?)
+                logging.warning('timepoint %s already passed. Waiting for the next one'%(str(self.measuring_times[self.time_counter]))) #If timepoint has passed, wait for the next one (or should we just measure right away?)
                 self.time_counter=self.time_counter+1
                 self.sample_counter=self.sample_counter+1
                 self.set_waiting_time()
             else:
                 return 0						#This indicates that experiment is NOT done, and that there is a next measurement.
         else:
-            print('Experiment is done!!')
+            logging.info('Experiment is done!!')
             return 1						#This indicates that experiment IS done. Close everything.
     def delete_events(self,frequency=2,repetitions=5,image_file="delete_events.png"):##Frequency is how many seconds to erase every time. Repetitions is how many times to erase
         """Constructor"""
@@ -175,10 +175,10 @@ class click:
         try:
             self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#path to the image
         except IOError:
-            print('Image file not found. Quitting..')
+            logging.warning('Image file not found. Quitting..')
             return
         if self._windowMgr._pos == None:
-            print('Could not delete events. Button not found on screen')
+            logging.warning('Could not delete events. Button not found on screen')
         else:
             time.sleep(15)
             for i in range(repetitions):
@@ -195,10 +195,10 @@ class click:
         try:
             self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#path to the image
         except IOError:
-            print('Image file not found. Quitting..')
+            logging.warning('Image file not found. Quitting..')
             return
         if self._windowMgr._pos == None:
-            print('Could not pause cytometer operation. Button not found on screen')
+            logging.warning('Could not pause cytometer operation. Button not found on screen')
         else:
             position=(self._windowMgr._pos[0]+50,self._windowMgr._pos[1]+10) #add position offset
             self._mouseMvr.move(position)
@@ -209,10 +209,10 @@ class click:
         try:
             self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#path to the image
         except IOError:
-            print('Image file not found. Quitting..')
+            logging.warning('Image file not found. Quitting..')
             return
         if self._windowMgr._pos == None:
-            print('Could not add sample well description. Button not found on screen')
+            logging.warning('Could not add sample well description. Button not found on screen')
         else:
             position=(self._windowMgr._pos[0]+80,self._windowMgr._pos[1]+8) #add position offset
             self._mouseMvr.move(position)
