@@ -1,19 +1,32 @@
 from fcm import loadFCS
 import numpy as np
-import os
-import csv
+import os,csv,time,logging
 
 class read_fcs:
 	def __init__(self,folder,cell_type=None):
 		self.folder=folder
 		self.cell_type=cell_type
+		self.extract_error=0
 	def extract_data(self,file_name):
-		self.data=loadFCS(os.path.join(self.folder,file_name))
+		try:
+			self.data=loadFCS(os.path.join(self.folder,file_name))
+		except IOError:		#If the file is not found, try again in 2 seconds (wait for the cytometer software to export the file) and if the files are still not found, give up.
+			if self.extract_error!=1:
+				self.extract_error=1
+				time.sleep(2)
+				self.extract_data(file_name)
+				return
+			else:
+				logging.warning('fcs file named %s was not found in folder %s',file_name,self.folder)
+				self.extract_error=0
+				return
+		self.extract_error=0
 		self.FSC_H=[self.data[:,index] for index in range(len(self.data.channels)) if self.data.channels[index]=='FSC-H'][0]#extracts data of desired channel.
 		self.SSC_H=[self.data[:,index] for index in range(len(self.data.channels)) if self.data.channels[index]=='SSC-H'][0]#extracts data of desired channel.
 		self.FSC_A=[self.data[:,index] for index in range(len(self.data.channels)) if self.data.channels[index]=='FSC-A'][0]#extracts data of desired channel.
 		self.SSC_A=[self.data[:,index] for index in range(len(self.data.channels)) if self.data.channels[index]=='SSC-A'][0]#extracts data of desired channel.
 		self.YFP=[self.data[:,index] for index in range(len(self.data.channels)) if self.data.channels[index]=='FL1-A'][0]#extracts data of desired channel.
+		
 	def gate(self):
 		if self.cell_type=='yeast' or self.cell_type==2:
 			M=np.matrix('6.3913 5.3564')
