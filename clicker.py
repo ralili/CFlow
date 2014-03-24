@@ -65,7 +65,7 @@ class click:
             key.tap(key.K_DOWN)
             time.sleep(0.1)
         key.tap(key.K_RETURN)
-        time.sleep(1)
+        time.sleep(2)
     def export(self):
 #        self._windowMgr.maximize_window()		##REMOVE
         key.tap(key.K_RETURN)

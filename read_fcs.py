@@ -46,7 +46,7 @@ class read_fcs:
 		elif self.cell_type=='ecoli' or self.cell_type==1:
 			center = np.array([4.3,3.3])
 			ingate = (3*(np.log10(self.FSC_A)-center[0])**2+0.5*(np.log10(self.SSC_A)-center[1]))**2<0.1
-			ingate = ingate*(self.YFP>300)
+			ingate = ingate*(self.YFP>400)
 			self.FSC_H=self.data[ingate,6]
 			self.FSC_A=self.data[ingate,0]
 			self.SSC_A=self.data[ingate,1]
