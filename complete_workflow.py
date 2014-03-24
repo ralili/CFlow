@@ -1,20 +1,21 @@
 import CFlow,time,threading,logging
 
+logging.basicConfig(filename='C:\\Users\\rumarc\\Desktop\\Results\\CFlow_execution.log', level=logging.INFO,filemode='w',format='%(asctime)s %(message)s',datefmt='%Y-%m-%d %H:%M')
 operate_arduino_object=CFlow.operate_arduino()
 
-day=18#starting day
-hour=12#starting hour
-minute=48#starting minute
+day=20#starting day
+hour=17#starting hour
+minute=44#starting minute
 frequency_sampling=10#frequency of cytometer measurements, in minutes
-samples=60#number of cytometer measurements in total
+samples=12#number of cytometer measurements in total
 frequency_light=3600#frequency of led changes, in seconds
-start_sample_well=0
+start_sample_well=40
 
 #CFLOW STARTUP
 #PUMP CALIBRATION
 #PUMP STARTUP
 def bring_sample(operate_arduino_object):
-  operate_arduino_object.sample_to_cytometer(1.3)##How much sample to take. 1.2
+  operate_arduino_object.sample_to_cytometer(1.2)##How much sample to take. 1.2
   operate_arduino_object.air_to_cytometer(1)#2
   operate_arduino_object.cytometer_to_waste(3)#3
   operate_arduino_object.push_to_cytometer(2.5)#2
@@ -37,8 +38,8 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
   click_object=CFlow.click(sample_counter=starting_well)
   click_object.set_measuring_times(day,hour,minute,frequency,num_samples)		#Set input correctly. day,hour,minute,frequency,num_samples
   read_fcs_object=CFlow.read_fcs('C:\\Users\\rumarc\\Desktop\\Results','ecoli')
-  logging.basicConfig(filename='C:\\Users\\rumarc\\Desktop\\Results\\CFlow_execution.log', level=logging.INFO,filemode='w',format='%(asctime)s %(message)s',datefmt='%Y-%m-%d %H:%M')
   operate_arduino_object.operate_led(1,256)####
+  operate_arduino_object.operate_led(2,0)####
   ##Feedback constants
   I=0
   P=0
@@ -59,16 +60,20 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
     ##PERFORM FEEDBACK
     YFP_mean=read_fcs_object.get_last_data(click_object)
     logging.info('YFP mean is: %d',YFP_mean)
+    print(YFP_mean)
     I=ki*(ref-YFP_mean)+I
+    print(I)
     logging.info('Integral parameter value is: %d',I)
     P=kp*(ref-YFP_mean)
+    print(P)
     logging.info('Proportional parameter value is: %d',P)
-    LED_signal=P+I##SET REFERENCE, SET P PARAMETER
+    LED_signal=P+I
     if LED_signal<0:
         LED_signal=0
     elif LED_signal>1:
         LED_signal=1
     logging.info('LED signal is: %d',LED_signal)
+    print(LED_signal)
     LED_signal=LED_signal*256
     operate_arduino_object.operate_led(2,LED_signal)
 	##
