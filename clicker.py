@@ -21,7 +21,7 @@ class click:
             return
         if self._windowMgr._pos == None:
             logging.warning('CFlow not ready to take measurements')
-            if self.button_not_found(self,image_file):
+            if self.button_not_found(image_file):
                 position=(self._windowMgr._pos[0]+73,self._windowMgr._pos[1]+22)
                 self._mouseMvr.move(position)
                 self._mouseMvr.click()
@@ -64,7 +64,7 @@ class click:
             return
         if self._windowMgr._pos == None:
             logging.warning('CFlow not open, no button positions available')
-            if self.button_not_found(self,image_file):
+            if self.button_not_found(image_file):
                 x_offset=(self.sample_counter%12)*24
                 y_offset=(self.sample_counter/12)*24
                 position=(self._windowMgr._pos[0]+x_offset+36,self._windowMgr._pos[1]+y_offset+8)	#position changed to bring to center of button
@@ -112,7 +112,7 @@ class click:
             return
         if self._windowMgr._pos == None:
             logging.warning('Not ready to backflush')
-            if self.button_not_found(self,image_file):
+            if self.button_not_found(image_file):
                 position=(self._windowMgr._pos[0]+32,self._windowMgr._pos[1]+24) #add position offset
                 self._mouseMvr.move(position)
                 self._mouseMvr.click()
@@ -230,7 +230,7 @@ class click:
             return
         if self._windowMgr._pos == None:
             logging.warning('Could not pause cytometer operation. Button not found on screen')
-            if self.button_not_found(self,image_file):
+            if self.button_not_found(image_file):
                 position=(self._windowMgr._pos[0]+50,self._windowMgr._pos[1]+10) #add position offset
                 self._mouseMvr.move(position)
                 self._mouseMvr.click()
@@ -248,7 +248,7 @@ class click:
             return
         if self._windowMgr._pos == None:
             logging.warning('Could not add sample well description. Button not found on screen')
-            if self.button_not_found(self,image_file):
+            if self.button_not_found(image_file):
                 position=(self._windowMgr._pos[0]+80,self._windowMgr._pos[1]+8) #add position offset
                 self._mouseMvr.move(position)
                 self._mouseMvr.click()
