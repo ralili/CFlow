@@ -1,5 +1,5 @@
-import CFlow,autopy,os,time,shutil,datetime,logging
-from autopy import key
+import CFlow,os,time,shutil,datetime,logging
+from autopy import key,alert
 
 class click:
     """Encapsulates some calls to the winapi for window management"""
@@ -21,6 +21,22 @@ class click:
             return
         if self._windowMgr._pos == None:
             logging.warning('CFlow not ready to take measurements')
+            if self.button_not_found(self,image_file):
+                position=(self._windowMgr._pos[0]+73,self._windowMgr._pos[1]+22)
+                self._mouseMvr.move(position)
+                self._mouseMvr.click()
+                self.time_counter=self.time_counter+1
+                self.sample_counter=self.sample_counter+1
+                self.delete_events()			#delete every 2 seconds, 5 times. Delete the first 10 seconds of measurement.
+                if self.checking_end_of_measurements()==1:
+                    logging.info('measurement %d done',self.time_counter)
+                    self.add_sample_well_description()
+                    self.save()
+                else:
+                    self.pause_cytometer()
+                    self.add_sample_well_description()
+                    self.save()
+                    return						#When measurement takes more than 5minutes, pause operation and move on.
         else:
             position=(self._windowMgr._pos[0]+73,self._windowMgr._pos[1]+22)
             self._mouseMvr.move(position)
@@ -38,7 +54,7 @@ class click:
                 self.save()
                 return						#When measurement takes more than 5minutes, pause operation and move on.
     def sample(self,image_file="sample_button2.png"):
-        self._windowMgr.maximize_window()
+        #self._windowMgr.maximize_window()
         """Constructor"""
         self._windowMgr.retake_screenshot()
         try:
@@ -48,6 +64,12 @@ class click:
             return
         if self._windowMgr._pos == None:
             logging.warning('CFlow not open, no button positions available')
+            if self.button_not_found(self,image_file):
+                x_offset=(self.sample_counter%12)*24
+                y_offset=(self.sample_counter/12)*24
+                position=(self._windowMgr._pos[0]+x_offset+36,self._windowMgr._pos[1]+y_offset+8)	#position changed to bring to center of button
+                self._mouseMvr.move(position)
+                self._mouseMvr.click()
         else:
             x_offset=(self.sample_counter%12)*24
             y_offset=(self.sample_counter/12)*24
@@ -90,6 +112,14 @@ class click:
             return
         if self._windowMgr._pos == None:
             logging.warning('Not ready to backflush')
+            if self.button_not_found(self,image_file):
+                position=(self._windowMgr._pos[0]+32,self._windowMgr._pos[1]+24) #add position offset
+                self._mouseMvr.move(position)
+                self._mouseMvr.click()
+                if self.checking_end_of_measurements()==1:
+                    return
+                else:
+                    return 'backflushing took too long. Moving on..'
         else:
             position=(self._windowMgr._pos[0]+32,self._windowMgr._pos[1]+24) #add position offset
             self._mouseMvr.move(position)
@@ -200,6 +230,10 @@ class click:
             return
         if self._windowMgr._pos == None:
             logging.warning('Could not pause cytometer operation. Button not found on screen')
+            if self.button_not_found(self,image_file):
+                position=(self._windowMgr._pos[0]+50,self._windowMgr._pos[1]+10) #add position offset
+                self._mouseMvr.move(position)
+                self._mouseMvr.click()
         else:
             position=(self._windowMgr._pos[0]+50,self._windowMgr._pos[1]+10) #add position offset
             self._mouseMvr.move(position)
@@ -214,6 +248,14 @@ class click:
             return
         if self._windowMgr._pos == None:
             logging.warning('Could not add sample well description. Button not found on screen')
+            if self.button_not_found(self,image_file):
+                position=(self._windowMgr._pos[0]+80,self._windowMgr._pos[1]+8) #add position offset
+                self._mouseMvr.move(position)
+                self._mouseMvr.click()
+                time.sleep(0.5)
+                sample_time=datetime.datetime.now()
+                sample_time=''.join([str(sample_time.hour),'h',str(sample_time.minute),'m'])
+                key.type_string(sample_time)
         else:
             position=(self._windowMgr._pos[0]+80,self._windowMgr._pos[1]+8) #add position offset
             self._mouseMvr.move(position)
@@ -222,3 +264,12 @@ class click:
             sample_time=datetime.datetime.now()
             sample_time=''.join([str(sample_time.hour),'h',str(sample_time.minute),'m'])
             key.type_string(sample_time)
+    def button_not_found(self,image_file):
+        """Constructor"""
+        alert.alert('Please maximize Cytometer software window! Program will try to locate it again in 5 seconds',"CFlow")
+        time.sleep(5)
+        self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#path to the image
+        if self._windowMgr._pos == None:
+            logging.warning('Image file was still not found')
+            return 0
+        return 1
