@@ -1,12 +1,13 @@
-import CFlow,os,time,shutil,datetime,logging
+import os,time,shutil,datetime,logging
 from autopy import key,alert
+from CFlow.screenshot import *
 
 class click:
     """Encapsulates some calls to the winapi for window management"""
     def __init__(self,sample_counter=0,image_directory='C:/Users/rumarc/Desktop/Images'):#Change directory where C6 images are stored
         """Constructor"""
-        self._windowMgr=CFlow.WindowMgr()
-        self._mouseMvr=CFlow.MouseMvr()
+        self._windowMgr=WindowMgr()
+        self._mouseMvr=MouseMvr()
         self.time_counter=0
         self.sample_counter=sample_counter
         self.image_directory=image_directory
