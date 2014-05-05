@@ -106,11 +106,6 @@ class operate_arduino(Arduino):
 		else:
 			return 'wrong led name'
 		self.analogWrite(pin,frequency)
-	def read_sensor(self,N=250):
-		value=0.
-		for i in range(N):
-			value=value+self.analogRead(self.sensor)/float(N)
-		return value/1024.*1100
 
 
 		
