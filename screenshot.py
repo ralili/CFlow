@@ -66,15 +66,3 @@ class WindowMgr:				#Has methods to find CFlow window handler, maximize that win
             return
         self.set_foreground()
         time.sleep(0.5)
-
-class MouseMvr:				#Has methods to move mouse and click buttons
-    """Encapsulates some calls to the mouse module from autopy"""
-    def __init__ (self):
-        """Constructor"""
-        self._position = None
-    def click(self):
-        """left-click"""
-        autopy.mouse.click()
-    def move(self,position):
-        """left-click a certain position, indicated via a list of two elements"""
-        autopy.mouse.move(position[0],position[1])
