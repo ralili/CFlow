@@ -58,13 +58,13 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
     click_object.moveFiles('C:\\Users\\rumarc\\Desktop','C:\\Users\\rumarc\\Desktop\\Results')###THIS CHANGES FROM COMPUTER TO COMPUTER. THE OUTPUT FOLDER MUST BE CREATED BEFOREHAND
     time.sleep(1)
     ##PERFORM FEEDBACK
-    YFP_mean=read_fcs_object.get_last_data(click_object)
-    logging.info('YFP mean is: %f',YFP_mean)
-#    print(YFP_mean)
-#    I=ki*(ref-YFP_mean)+I
+    GFP_mean=read_fcs_object.get_last_data(click_object)
+    logging.info('GFP mean is: %f',GFP_mean)
+#    print(GFP_mean)
+#    I=ki*(ref-GFP_mean)+I
 #    print(I)
 #    logging.info('Integral parameter value is: %f',I)
-#    P=kp*(ref-YFP_mean)
+#    P=kp*(ref-GFP_mean)
 #    print(P)
 #    logging.info('Proportional parameter value is: %f',P)
 #    LED_signal=P+I

@@ -1,8 +1,6 @@
 import CFlow,time,threading,logging,math
 
-logging.basicConfig(filename='C:\\Users\\rumarc\\Desktop\\Results\\CFlow_execution.log', level=logging.INFO,filemode='w',format='%(asctime)s %(message)s',datefmt='%Y-%m-%d %H:%M')
-operate_arduino_object=CFlow.operate_arduino()
-
+logger_file_name='C:\\Users\\rumarc\\Desktop\\Results\\CFlow_execution.log'
 day=1#starting day
 hour=11#starting hour
 minute=16#starting minute
@@ -10,6 +8,11 @@ frequency_sampling=10#frequency of cytometer measurements, in minutes
 samples=48#number of cytometer measurements in total
 frequency_light=3600#frequency of led changes, in seconds
 start_sample_well=0
+
+logging.basicConfig(filename=logger_file_name, level=logging.INFO,filemode='w',format='%(asctime)s %(message)s',datefmt='%Y-%m-%d %H:%M')
+operate_arduino_object=CFlow.operate_arduino()
+
+
 
 reference=[]
 for i in range(samples+1):				##Check that everything works goo if
@@ -64,14 +67,14 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
     click_object.moveFiles('C:\\Users\\rumarc\\Desktop','C:\\Users\\rumarc\\Desktop\\Results')###THIS CHANGES FROM COMPUTER TO COMPUTER. THE OUTPUT FOLDER MUST BE CREATED BEFOREHAND
     time.sleep(1)
     ##PERFORM FEEDBACK
-    YFP_mean=read_fcs_object.get_last_data(click_object)
-    logging.info('YFP mean is: %f',YFP_mean)
+    GFP_mean=read_fcs_object.get_last_data(click_object)
+    logging.info('GFP mean is: %f',GFP_mean)
     logging.info('reference is: %f',ref[num_cycles])
-    print(YFP_mean)
-    I=ki*(ref[num_cycles]-YFP_mean)+I
+    print(GFP_mean)
+    I=ki*(ref[num_cycles]-GFP_mean)+I
     print(I)
     logging.info('Integral parameter value is: %f',I)
-    P=kp*(ref[num_cycles]-YFP_mean)
+    P=kp*(ref[num_cycles]-GFP_mean)
     print(P)
     logging.info('Proportional parameter value is: %f',P)
     LED_signal=P+I
