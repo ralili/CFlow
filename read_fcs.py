@@ -25,7 +25,7 @@ class read_fcs:
 		self.SSC_H=[self.data[:,index] for index in range(len(self.data.channels)) if self.data.channels[index]=='SSC-H'][0]#extracts data of desired channel.
 		self.FSC_A=[self.data[:,index] for index in range(len(self.data.channels)) if self.data.channels[index]=='FSC-A'][0]#extracts data of desired channel.
 		self.SSC_A=[self.data[:,index] for index in range(len(self.data.channels)) if self.data.channels[index]=='SSC-A'][0]#extracts data of desired channel.
-		self.YFP=[self.data[:,index] for index in range(len(self.data.channels)) if self.data.channels[index]=='FL1-A'][0]#extracts data of desired channel.
+		self.GFP=[self.data[:,index] for index in range(len(self.data.channels)) if self.data.channels[index]=='FL1-A'][0]#extracts data of desired channel.
 		
 	def gate(self):
 		if self.cell_type=='yeast' or self.cell_type==2:
@@ -42,40 +42,40 @@ class read_fcs:
 			self.SSC_H=self.data[ingate,7]
 			self.FSC_A=self.data[ingate,0]
 			self.SSC_A=self.data[ingate,1]
-			self.YFP=self.data[ingate,2]##FL1_A
+			self.GFP=self.data[ingate,2]##FL1_A
 		elif self.cell_type=='ecoli' or self.cell_type==1:
 			center = np.array([4.3,3.3])
 			ingate = (3*(np.log10(self.FSC_A)-center[0])**2+0.5*(np.log10(self.SSC_A)-center[1]))**2<0.1
-			ingate = ingate*(self.YFP>400)
+			ingate = ingate*(self.GFP>500)
 			self.FSC_H=self.data[ingate,6]
 			self.FSC_A=self.data[ingate,0]
 			self.SSC_A=self.data[ingate,1]
-			self.YFP= self.data[ingate,2]##FL1_A
+			self.GFP= self.data[ingate,2]##FL1_A
 	def normalize(self):
-		self.YFPnorm_fsc= self.YFP.astype(float)/self.FSC_H.astype(float);
-		#self.YFPnorm_ssc= self.YFP.astype(float)/self.SSC_A.astype(float);
-		self.mean_all_fsc= np.mean(self.YFPnorm_fsc);
-		#self.mean_all_ssc = np.mean(YFPnorm_ssc);
-		self.median_all_fsc= np.median(self.YFPnorm_fsc);
-		#self.median_all_ssc= np.median(YFPnorm_ssc);
-		self.var_all_fsc= np.var(self.YFPnorm_fsc);
-		#self.var_all_ssc= np.var(YFPnorm_ssc);
-		self.mean_all = np.mean(self.YFP);
+		self.GFPnorm_fsc= self.GFP.astype(float)/self.FSC_H.astype(float);
+		#self.GFPnorm_ssc= self.GFP.astype(float)/self.SSC_A.astype(float);
+		self.mean_all_fsc= np.mean(self.GFPnorm_fsc);
+		#self.mean_all_ssc = np.mean(GFPnorm_ssc);
+		self.median_all_fsc= np.median(self.GFPnorm_fsc);
+		#self.median_all_ssc= np.median(GFPnorm_ssc);
+		self.var_all_fsc= np.var(self.GFPnorm_fsc);
+		#self.var_all_ssc= np.var(GFPnorm_ssc);
+		self.mean_all = np.mean(self.GFP);
 	def print_results(self):
 		files = [ f for f in os.listdir(self.folder) if (os.path.isfile(os.path.join(self.folder,f)) and f[-4:]=='.fcs')]
 		self.means=[]
-		self.medians=[]
+		self.var=[]
 		for f in files:
 			self.extract_data(f)
 			self.gate()
 			self.normalize()
 			self.means.append(self.mean_all_fsc)
-			self.medians.append(self.median_all_fsc)
+			self.var.append(self.var_all_fsc)
 		csvfile=open(os.path.join(self.folder,'results.csv'),'w+')
 		csvwriter = csv.writer(csvfile, dialect='excel')
 		csvwriter.writerow(files)
 		csvwriter.writerow(self.means)
-		csvwriter.writerow(self.medians)
+		csvwriter.writerow(self.var)
 		csvfile.close()
 	def get_last_data(self,click_object):
 		last_sample=click_object.sample_counter-1
