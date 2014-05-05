@@ -1,6 +1,8 @@
 import os,time,shutil,datetime,logging
-from autopy import key,alert
+from autopy import key,alert,mouse
 from CFlow.screenshot import *
+##Optimize button_not_found.
+
 
 class click:
     """Encapsulates some calls to the winapi for window management"""
@@ -18,42 +20,28 @@ class click:
         try:
             self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#path to the image
         except IOError:
-            logging.warning('Image file not found. Quitting..')
+            logging.warning('Image file Run Button not found. Quitting..')
             return
         if self._windowMgr._pos == None:
             logging.warning('CFlow not ready to take measurements')
-            if self.button_not_found(image_file):
-                position=(self._windowMgr._pos[0]+73,self._windowMgr._pos[1]+22)
-                self._mouseMvr.move(position)
-                self._mouseMvr.click()
-                self.time_counter=self.time_counter+1
-                self.sample_counter=self.sample_counter+1
-                self.delete_events()			#delete every 2 seconds, 5 times. Delete the first 10 seconds of measurement.
-                if self.checking_end_of_measurements()==1:
-                    logging.info('measurement %d done',self.time_counter)
-                    self.add_sample_well_description()
-                    self.save()
-                else:
-                    self.pause_cytometer()
-                    self.add_sample_well_description()
-                    self.save()
-                    return						#When measurement takes more than 5minutes, pause operation and move on.
+            if not self.button_not_found(image_file):
+                return
+        position=(self._windowMgr._pos[0]+73,self._windowMgr._pos[1]+22)
+        mouse.move(position[0],position[1])
+        mouse.click()
+        self.time_counter=self.time_counter+1
+        self.sample_counter=self.sample_counter+1
+        self.delete_events()			#delete every 2 seconds, 5 times. Delete the first 10 seconds of measurement.
+        if self.checking_end_of_measurements()==1:
+            logging.info('measurement %d done',self.time_counter)
+            self.add_sample_well_description()
+            self.save()
         else:
-            position=(self._windowMgr._pos[0]+73,self._windowMgr._pos[1]+22)
-            self._mouseMvr.move(position)
-            self._mouseMvr.click()
-            self.time_counter=self.time_counter+1
-            self.sample_counter=self.sample_counter+1
-            self.delete_events()			#delete every 2 seconds, 5 times. Delete the first 10 seconds of measurement.
-            if self.checking_end_of_measurements()==1:
-                logging.info('measurement %d done',self.time_counter)
-                self.add_sample_well_description()
-                self.save()
-            else:
-                self.pause_cytometer()
-                self.add_sample_well_description()
-                self.save()
-                return						#When measurement takes more than 5minutes, pause operation and move on.
+            self.pause_cytometer()
+            self.add_sample_well_description()
+            self.save()
+            logging.info('Running cytometer measurements took too long (more 5 minutes). Measurements were paused and proceeding to next step',self.time_counter)
+            return
     def sample(self,image_file="sample_button2.png"):
         #self._windowMgr.maximize_window()
         """Constructor"""
@@ -61,22 +49,17 @@ class click:
         try:
             self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#path to the image
         except IOError:
-            logging.warning('Image file not found. Quitting..')
+            logging.warning('Image file Sample Button not found. Proceeding to next step..')
             return
         if self._windowMgr._pos == None:
             logging.warning('CFlow not open, no button positions available')
-            if self.button_not_found(image_file):
-                x_offset=(self.sample_counter%12)*24
-                y_offset=(self.sample_counter/12)*24
-                position=(self._windowMgr._pos[0]+x_offset+36,self._windowMgr._pos[1]+y_offset+8)	#position changed to bring to center of button
-                self._mouseMvr.move(position)
-                self._mouseMvr.click()
-        else:
-            x_offset=(self.sample_counter%12)*24
-            y_offset=(self.sample_counter/12)*24
-            position=(self._windowMgr._pos[0]+x_offset+36,self._windowMgr._pos[1]+y_offset+8)	#position changed to bring to center of button
-            self._mouseMvr.move(position)
-            self._mouseMvr.click()
+            if not self.button_not_found(image_file):
+                return
+        x_offset=(self.sample_counter%12)*24
+        y_offset=(self.sample_counter/12)*24
+        position=(self._windowMgr._pos[0]+x_offset+36,self._windowMgr._pos[1]+y_offset+8)	#position changed to bring to center of button
+        mouse.move(position[0],position[1])
+        mouse.click()
     def save(self):   # It needs to have been saved once already!!
         """Constructor"""
 #        self._windowMgr.maximize_window()		##REMOVE
@@ -102,34 +85,26 @@ class click:
         time.sleep(0.3)
         key.tap(key.K_RETURN)
         time.sleep(1)
-
     def backflush(self,image_file="backflush.png"):
         """Constructor"""
         self._windowMgr.retake_screenshot()
         try:
             self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#path to the image
         except IOError:
-            logging.warning('Image file not found. Quitting..')
+            logging.warning('Image file Backflush not found. Proceeding to next step..')
             return
         if self._windowMgr._pos == None:
             logging.warning('Not ready to backflush')
-            if self.button_not_found(image_file):
-                position=(self._windowMgr._pos[0]+32,self._windowMgr._pos[1]+24) #add position offset
-                self._mouseMvr.move(position)
-                self._mouseMvr.click()
-                if self.checking_end_of_measurements()==1:
-                    return
-                else:
-                    return 'backflushing took too long. Moving on..'
-        else:
-            position=(self._windowMgr._pos[0]+32,self._windowMgr._pos[1]+24) #add position offset
-            self._mouseMvr.move(position)
-            self._mouseMvr.click()
-            if self.checking_end_of_measurements()==1:
+            if not self.button_not_found(image_file):
                 return
-            else:
-                return 'backflushing took too long. Moving on..'
-
+        position=(self._windowMgr._pos[0]+32,self._windowMgr._pos[1]+24) #add position offset
+        mouse.move(position[0],position[1])
+        mouse.click()
+        if self.checking_end_of_measurements()==1:
+            return
+        else:
+            logging.warning('backflushing took too long. Moving on..')
+            return
     def checking_end_of_measurements(self,image_file_ready="cytometer_ready.png"):##Add the checking whether CFlow is maximized. What if just don't minimize every time?
         """Constructor"""
         time.sleep(5)
@@ -137,18 +112,18 @@ class click:
         too_much_time=0
         while not done:
             too_much_time=too_much_time+1
-            time.sleep(5)
+            time.sleep(5)				#Every how many seconds too_much_time increases by one unit
             self._windowMgr.retake_screenshot()
             try:
                 self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file_ready))	#Name of the button image
             except IOError:
-                logging.warning('Image file not found. Quitting..')
+                logging.warning('Image file Cytometer Ready not found. Quitting..')
                 return
             if self._windowMgr._pos != None:
                 done=1
                 return 1
             else:
-                if too_much_time>60:					#When cytometer takes more than 5 minutes, pause operation and move on.
+                if too_much_time>60:					#When cytometer takes more than 5 minutes, pause operation and move on. too_much_time increases one unit every 5 seconds.
                     done=1
                     return 0
     def moveFiles(self,desktop_dir,destination_dir,CFlow_dir='FCS Exports'):
@@ -166,7 +141,7 @@ class click:
                     logging.warning('Specified CFlow directory (where it exports) could not be found')
             elif self.export_counter!=1:
                 logging.warning('Error. No files found to export. Trying to export once more')
-                self._windowMgr.maximize_window()
+#                self._windowMgr.maximize_window()
                 self.export_counter=1
                 self.export()
                 time.sleep(2)
@@ -174,8 +149,6 @@ class click:
             else:
                 logging.warning('Error. Still no files found to export')
                 self.export_counter=0
-			#desktop_dir='C:\\Users\\rumarc\\Desktop'
-			#dir = os.path.join(desktop_dir,CFlow_dir)
         else:
             logging.warning('specified paths for Desktop or Output could not be found')
     def set_measuring_times(self,day,hour,minute,frequency,num_samples):#frequency is in minutes
@@ -207,7 +180,7 @@ class click:
         try:
             self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#path to the image
         except IOError:
-            logging.warning('Image file not found. Quitting..')
+            logging.warning('Image file Delete Events not found. Quitting..')
             return
         if self._windowMgr._pos == None:
             logging.warning('Could not delete events. Button not found on screen')
@@ -216,9 +189,9 @@ class click:
             for i in range(repetitions):
                 time.sleep(frequency)
                 position=(self._windowMgr._pos[0]+32,self._windowMgr._pos[1]+15) #add position offset
-                self._mouseMvr.move(position)
+                mouse.move(position[0],position[1])
                 time.sleep(0.1)
-                self._mouseMvr.click()
+                mouse.click()
                 time.sleep(0.4)
                 key.tap(key.K_RETURN)
     def pause_cytometer(self,image_file="pause.png"):
@@ -227,50 +200,40 @@ class click:
         try:
             self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#path to the image
         except IOError:
-            logging.warning('Image file not found. Quitting..')
+            logging.warning('Image file Pause not found. Quitting..')
             return
         if self._windowMgr._pos == None:
             logging.warning('Could not pause cytometer operation. Button not found on screen')
-            if self.button_not_found(image_file):
-                position=(self._windowMgr._pos[0]+50,self._windowMgr._pos[1]+10) #add position offset
-                self._mouseMvr.move(position)
-                self._mouseMvr.click()
-        else:
-            position=(self._windowMgr._pos[0]+50,self._windowMgr._pos[1]+10) #add position offset
-            self._mouseMvr.move(position)
-            self._mouseMvr.click()
+            if not self.button_not_found(image_file):
+                return
+        position=(self._windowMgr._pos[0]+50,self._windowMgr._pos[1]+10) #add position offset
+        mouse.move(position[0],position[1])
+        mouse.click()
     def add_sample_well_description(self,image_file="sample_well_description.png"):
         """Constructor"""
         self._windowMgr.retake_screenshot()
         try:
             self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#path to the image
         except IOError:
-            logging.warning('Image file not found. Quitting..')
+            logging.warning('Image file Sample Well Description not found. Quitting..')
             return
         if self._windowMgr._pos == None:
             logging.warning('Could not add sample well description. Button not found on screen')
-            if self.button_not_found(image_file):
-                position=(self._windowMgr._pos[0]+80,self._windowMgr._pos[1]+8) #add position offset
-                self._mouseMvr.move(position)
-                self._mouseMvr.click()
-                time.sleep(0.5)
-                sample_time=datetime.datetime.now()
-                sample_time=''.join([str(sample_time.hour),'h',str(sample_time.minute),'m'])
-                key.type_string(sample_time)
-        else:
-            position=(self._windowMgr._pos[0]+80,self._windowMgr._pos[1]+8) #add position offset
-            self._mouseMvr.move(position)
-            self._mouseMvr.click()
-            time.sleep(0.5)
-            sample_time=datetime.datetime.now()
-            sample_time=''.join([str(sample_time.hour),'h',str(sample_time.minute),'m'])
-            key.type_string(sample_time)
+            if not self.button_not_found(image_file):
+                return
+        position=(self._windowMgr._pos[0]+80,self._windowMgr._pos[1]+8) #add position offset
+        mouse.move(position[0],position[1])
+        mouse.click()
+        time.sleep(0.5)
+        sample_time=datetime.datetime.now()
+        sample_time=''.join([str(sample_time.hour),'h',str(sample_time.minute),'m'])
+        key.type_string(sample_time)
     def button_not_found(self,image_file):
         """Constructor"""
-        alert.alert('Please maximize Cytometer software window! Program will try to locate it again in 5 seconds',"CFlow")
+        alert.alert('Please maximize Cytometer software window! After pressing OK, CFlow will try to locate it again in 5 seconds',"CFlow")
         time.sleep(5)
         self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#path to the image
         if self._windowMgr._pos == None:
-            logging.warning('Image file was still not found')
+            logging.warning('Image file was still not found. Operation will proceed, skipping this step.')
             return 0
         return 1
