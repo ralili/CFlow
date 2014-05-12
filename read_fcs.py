@@ -8,6 +8,7 @@ class read_fcs:
 		self.cell_type=cell_type
 		self.extract_error=0
 	def extract_data(self,file_name):
+	#extract data from the specified file and save it into memory
 		try:
 			self.data=loadFCS(os.path.join(self.folder,file_name))
 		except IOError:		#If the file is not found, try again in 2 seconds (wait for the cytometer software to export the file) and if the files are still not found, give up.
@@ -25,9 +26,9 @@ class read_fcs:
 		self.SSC_H=[self.data[:,index] for index in range(len(self.data.channels)) if self.data.channels[index]=='SSC-H'][0]#extracts data of desired channel.
 		self.FSC_A=[self.data[:,index] for index in range(len(self.data.channels)) if self.data.channels[index]=='FSC-A'][0]#extracts data of desired channel.
 		self.SSC_A=[self.data[:,index] for index in range(len(self.data.channels)) if self.data.channels[index]=='SSC-A'][0]#extracts data of desired channel.
-		self.GFP=[self.data[:,index] for index in range(len(self.data.channels)) if self.data.channels[index]=='FL1-A'][0]#extracts data of desired channel.
-		
+		self.GFP=[self.data[:,index] for index in range(len(self.data.channels)) if self.data.channels[index]=='FL1-A'][0]#extracts data of desired channel.	
 	def gate(self):
+	#gate data in memory
 		if self.cell_type=='yeast' or self.cell_type==2:
 			M=np.matrix('6.3913 5.3564')
 			C = np.matrix('0.0392,0.0354;0.0354,0.0708')
@@ -52,6 +53,7 @@ class read_fcs:
 			self.SSC_A=self.data[ingate,1]
 			self.GFP= self.data[ingate,2]##FL1_A
 	def normalize(self):
+	#Normalize data in memory
 		self.GFPnorm_fsc= self.GFP.astype(float)/self.FSC_H.astype(float);
 		#self.GFPnorm_ssc= self.GFP.astype(float)/self.SSC_A.astype(float);
 		self.mean_all_fsc= np.mean(self.GFPnorm_fsc);
@@ -62,6 +64,7 @@ class read_fcs:
 		#self.var_all_ssc= np.var(GFPnorm_ssc);
 		self.mean_all = np.mean(self.GFP);
 	def print_results(self):
+	#generate a csv file with the normalized mean of all .fcs files in the folder
 		files = [ f for f in os.listdir(self.folder) if (os.path.isfile(os.path.join(self.folder,f)) and f[-4:]=='.fcs')]
 		self.means=[]
 		self.var=[]
@@ -78,6 +81,7 @@ class read_fcs:
 		csvwriter.writerow(self.var)
 		csvfile.close()
 	def get_last_data(self,click_object):
+	#Get normalized mean from last sample taken
 		last_sample=click_object.sample_counter-1
 		letter_list=['A','B','C','D','E','F','G','H']
 		letter=letter_list[(last_sample/12)]
@@ -88,7 +92,15 @@ class read_fcs:
 		self.gate()
 		self.normalize()
 		return self.mean_all_fsc
-
+	def sampleToCSV(self,file_name):
+	#Generate csv file with normalized GFP fluorescence of current data in memory
+		self.extract_data(file_name)
+		self.gate()
+		self.normalize()
+		csvfile=open(os.path.join(self.folder,file_name[:-3]+'csv'),'w+')
+		csvwriter = csv.writer(csvfile, dialect='excel')
+		csvwriter.writerow(self.GFPnorm_fsc)
+		csvfile.close()
 
 #available channels: ['FSC-A', 'SSC-A', 'FL1-A', 'FL2-A', 'FL3-A', 'FL4-A', 'FSC-H', 'SSC-H', 'FL1-H', 'FL2-H', 'FL3-H', 'FL4-H', 'Width', 'Time']
 
