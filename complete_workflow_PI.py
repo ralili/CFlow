@@ -24,7 +24,7 @@ def bring_sample(operate_arduino_object):
   operate_arduino_object.cytometer_to_waste(3)#3
   operate_arduino_object.push_to_cytometer(2)#2
   operate_arduino_object.cytometer_to_waste(3)#3
-  operate_arduino_object.push_to_cytometer(0.9)##Critical time step. 2
+  operate_arduino_object.push_to_cytometer(0.4)##Critical time step. 2
   operate_arduino_object.push_to_cytometer(0)##0.3
   operate_arduino_object.cytometer_to_waste(7)#7
   operate_arduino_object.push_to_cytometer(1)##How much sample to introduce into cytometer. 1
