@@ -9,25 +9,25 @@ class MPC:
         self.B=np.matrix('9.874;39.31')
         self.C=np.matrix('-0.006362 0.001674')
         self.R=1
-        self.Q=np.asmatrix(np.identity(len(A)))*100
-        self.P=np.asmatrix(np.empty(shape=(len(A),len(A))))
-		self.y=0
-		self.x=np.matrix('0;0')
-		self.u=0
+        self.Q=np.asmatrix(np.identity(len(self.A)))*100
+        self.P=np.asmatrix(np.empty(shape=(len(self.A),len(self.A))))
+        self.y=0
+        self.x=np.matrix('0;0')
+        self.u=0
 
-    def kalmanFilter(self,u,y0,x0=self.x,A=self.A,B=self.B,C=self.C,Q=self.Q,R=self.R,P0=self.P):
+    def kalmanFilter(self,u,y0):
         """ """
-        xm=(A*x0+B*u)
-        Pm=(A*P0*A.T+Q)
-        ym=y0-C*xm
-        L=Pm*C.T/(C*Pm*C.T+R)
+        xm=(self.A*self.x+self.B*u)
+        Pm=(self.A*self.P*self.A.T+self.Q)
+        ym=y0-self.C*xm
+        L=Pm*self.C.T/(self.C*Pm*self.C.T+self.R)
         self.x=xm+L*ym;
-        self.y=C*self.x;
-        self.P=(np.asmatrix(np.identity(len(x0)))-L*C)*Pm
+        self.y=self.C*self.x;
+        self.P=(np.asmatrix(np.identity(len(self.x)))-L*self.C)*Pm
 
-    def prediction(self,reference,x=self.x,A=self.A,B=self.B,C=self.C):
+    def prediction(self,reference):
         """ """
-        u=1/float(C*B)*float(reference-C*A*x)
+        u=1/float(self.C*self.B)*float(reference-self.C*self.A*self.x)
         if u<0:
             u=0
         elif u>1:
