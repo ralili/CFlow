@@ -44,6 +44,7 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
   controller=CFlow.MPC()
   reference=[0.66]*(num_samples+2)
   LED_signal=0
+  ####Need to add something to subtract initial offset from data!!!
   ##
   cycle=0
   while click_object.set_waiting_time()==0:
