@@ -15,16 +15,15 @@ class MPC:
 		self.x=np.matrix('0;0')
 		self.u=0
 
-    def kalmanFilter(self,u,y0=self.y,x0=self.x,A=self.A,B=self.B,C=self.C,Q=self.Q,R=self.R,P0=self.P):
+    def kalmanFilter(self,u,y0,x0=self.x,A=self.A,B=self.B,C=self.C,Q=self.Q,R=self.R,P0=self.P):
         """ """
         xm=(A*x0+B*u)
         Pm=(A*P0*A.T+Q)
         ym=y0-C*xm
         L=Pm*C.T/(C*Pm*C.T+R)
-        x=xm+L*ym;
-        y=C*x;
-        P=(np.asmatrix(np.identity(len(x0)))-L*C)*Pm
-        return [x,y,P]
+        self.x=xm+L*ym;
+        self.y=C*self.x;
+        self.P=(np.asmatrix(np.identity(len(x0)))-L*C)*Pm
 
     def prediction(self,reference,x=self.x,A=self.A,B=self.B,C=self.C):
         """ """
