@@ -5,14 +5,14 @@ class MPC:
     """ """
     def __init__(self):
         """ """
-        self.A=np.matrix('0.9643 -0.00631; 6.947 0.4472')
-        self.B=np.matrix('9.874;39.31')
-        self.C=np.matrix('-0.006362 0.001674')
+        self.A=np.matrix('0.1028,-0.3208,-0.1697;0.6076,0.7442,-0.1385;0.06197,0.1414,0.9919')
+        self.B=np.matrix('1.215;0.9915;0.05822')
+        self.C=np.matrix('0,0,0.2151')
         self.R=1.
         self.Q=np.asmatrix(np.identity(len(self.A)))*100
         self.P=np.asmatrix(np.empty(shape=(len(self.A),len(self.A))))
         self.y=0.
-        self.x=np.matrix('0;0')
+        self.x=np.matrix('0;0;0')
         self.u=0.
     def kalmanFilter(self,u,y0):
         """ """
