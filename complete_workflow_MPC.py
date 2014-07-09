@@ -47,6 +47,7 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
   ####Need to add something to subtract initial offset from data!!!
   ##
   cycle=0
+  offset=0	#This is the offset that will be applied to both the GFP mean and the reference value. This is because the model fitting was done subtracting the initial timepoint from all the data.
   while click_object.set_waiting_time()==0:
     time.sleep(click_object.waiting_time)
     logging.info('waiting time until next measurement is: %f',click_object.waiting_time)
@@ -61,8 +62,10 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
     GFP_mean=read_fcs_object.get_last_data(click_object)
     logging.info('GFP mean is: %f',GFP_mean)
     print(GFP_mean)
-    controller.kalmanFilter(LED_signal,GFP_mean)
-    LED_signal=controller.prediction(reference[cycle])####!!!!
+    if cycle==0:
+      offset=GFP_mean
+    controller.kalmanFilter(LED_signal,GFP_mean-offset)
+    LED_signal=controller.prediction(reference[cycle]-offset)####!!!!
     logging.info('LED signal is: %f',LED_signal)
     logging.info('reference is: %f',reference[cycle])
     print(LED_signal)
