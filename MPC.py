@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.optimize import leastsq
+from scipy.optimize import minimize
 
 class MPC:
     """ """
@@ -14,6 +14,7 @@ class MPC:
         self.y=0.
         self.x=np.matrix('0;0;0')
         self.u=0.
+        self.bnds = ((0, 1), (0, 1), (0, 1), (0, 1), (0, 1))#Change to incorporate number of steps
     def kalmanFilter(self,u,y0):
         """ """
         xm=(self.A*self.x+self.B*u)
@@ -31,16 +32,13 @@ class MPC:
         elif u>1:
             u=1
         return u
-    def cost(self,input,reference,weights=np.array([1.,1.,1.])):
+    def cost(self,input,reference,weights=np.array([1.,1.,1.,1.,1.])):#introduce number of steps
         predicted_output=np.array([0.]*len(weights))
         hiddenStates=self.x
         for i in range(len(weights)):
             predicted_output[i]=self.C*(self.B*input[i]+self.A*hiddenStates)
             hiddenStates=self.B*input[i]+self.A*hiddenStates
-#        if any(abs(input)>1):
-#            return 1e10
-#        else:
-        return abs((predicted_output-reference)*weights)
+        return sum(abs((predicted_output-reference)*weights))
     def multiPrediction(self,reference):
-        return leastsq(self.cost,np.array([0.,0.,0.]),(reference))[0]
+        return minimize(self.cost,np.array([1.,1.,1.,1.,1.]),args=(reference,),method='SLSQP',bounds=self.bnds).x[0]#introduce number of steps
 
