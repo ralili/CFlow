@@ -1,4 +1,5 @@
 import CFlow,time,threading,logging
+import numpy as np
 
 logging.basicConfig(filename='C:\\Users\\rumarc\\Desktop\\Results\\CFlow_execution.log', level=logging.INFO,filemode='w',format='%(asctime)s %(message)s',datefmt='%Y-%m-%d %H:%M')
 operate_arduino_object=CFlow.operate_arduino()
@@ -42,7 +43,7 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
   operate_arduino_object.operate_led(2,0*256)####
   ##controller setup
   controller=CFlow.MPC()
-  reference=[0.66]*(num_samples+2)
+  reference=np.zeros(shape=(1,(num_samples+2)))+0.66
   LED_signal=0
   ####Need to add something to subtract initial offset from data!!!
   ##
@@ -65,9 +66,9 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
     if cycle==0:
       offset=GFP_mean
     controller.kalmanFilter(LED_signal,GFP_mean-offset)
-    LED_signal=controller.prediction(reference[cycle]-offset)####!!!!
+    LED_signal=controller.multiPrediction(reference[0][cycle:cycle+5]-offset)####!!!!
     logging.info('LED signal is: %f',LED_signal)
-    logging.info('reference is: %f',reference[cycle])
+    logging.info('reference is: %f',reference[0][cycle])
     print(LED_signal)
     operate_arduino_object.operate_led(2,LED_signal*256)
 	##
