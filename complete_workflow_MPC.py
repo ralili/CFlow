@@ -85,11 +85,5 @@ def led_operation(day,hour,minute,frequency,operate_arduino_object):#frequency i
   led.led_guide()
   return
 
-
-
-
 thread1=threading.Thread(target=pumping_operation, args = (day,hour,minute,frequency_sampling,samples,operate_arduino_object,start_sample_well))
 thread1.start()
-
-#thread2=threading.Thread(target=led_operation, args = (day,hour,minute,frequency_light,operate_arduino_object))
-#thread2.start()
