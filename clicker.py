@@ -9,7 +9,6 @@ class click:
     def __init__(self,sample_counter=0,image_directory='C:/Users/rumarc/Desktop/Images'):#Change directory where C6 images are stored
         """Constructor"""
         self._windowMgr=WindowMgr()
-        self._mouseMvr=MouseMvr()
         self.time_counter=0
         self.sample_counter=sample_counter
         self.image_directory=image_directory
