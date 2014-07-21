@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.optimize import minimize
+import logging
 
 class MPC:
     """ """
@@ -24,6 +25,10 @@ class MPC:
         self.x=xm+L*ym;
         self.y=self.C*self.x;
         self.P=(np.asmatrix(np.identity(len(self.x)))-L*self.C)*Pm
+        loggingState=''
+        for i in range(len(self.x)):
+          loggingState+=str(self.x[i])+','
+        logging.info('SS hidden states are: %s',loggingState)
     def prediction(self,reference):
         """ """
         u=1/float(self.C*self.B)*float(reference-self.C*self.A*self.x)
