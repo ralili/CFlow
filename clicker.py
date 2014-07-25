@@ -1,5 +1,5 @@
 import os,time,shutil,datetime,logging
-from autopy import key,alert,mouse
+from autopy import key,mouse
 from CFlow.screenshot import *
 ##Optimize button_not_found.
 
@@ -227,10 +227,13 @@ class click:
         sample_time=datetime.datetime.now()
         sample_time=''.join([str(sample_time.hour),'h',str(sample_time.minute),'m'])
         key.type_string(sample_time)
-    def button_not_found(self,image_file):
+    def button_not_found(self,image_file,image_location='C:\\Users\\rumarc\\Desktop\\Results'):		#Path where error image is saved needs to be set!!
         """Constructor"""
-        alert.alert('Please maximize Cytometer software window! After pressing OK, CFlow will try to locate it again in 5 seconds',"CFlow")
-        time.sleep(5)
+        ####Save screenshot. Wait 10s and try to find image again. If none found, warning and continue.
+        sample_time=datetime.datetime.now()
+        self._windowMgr._screenshot.save(os.path.join(self.image_directory,''.join(['error',str(sample_time.hour),'h',str(sample_time.minute),'m','.bmp'])))#Save the error screenshot
+        time.sleep(10)
+        self._windowMgr.retake_screenshot()
         self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#path to the image
         if self._windowMgr._pos == None:
             logging.warning('Image file was still not found. Operation will proceed, skipping this step.')
