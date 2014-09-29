@@ -227,11 +227,11 @@ class click:
         sample_time=datetime.datetime.now()
         sample_time=''.join([str(sample_time.hour),'h',str(sample_time.minute),'m'])
         key.type_string(sample_time)
-    def button_not_found(self,image_file,image_location='C:\\Users\\rumarc\\Desktop\\Results'):		#Path where error image is saved needs to be set!!
+    def button_not_found(self,image_file,image_location='C://Users//rumarc//Desktop//Results'):		#Path where error image is saved needs to be set!!
         """Constructor"""
         ####Save screenshot. Wait 10s and try to find image again. If none found, warning and continue.
         sample_time=datetime.datetime.now()
-        self._windowMgr._screenshot.save(os.path.join(self.image_directory,''.join(['error',str(sample_time.hour),'h',str(sample_time.minute),'m','.bmp'])))#Save the error screenshot
+        self._windowMgr._screenshot.save(os.path.join(image_location,''.join(['error',str(sample_time.hour),'h',str(sample_time.minute),'m','.bmp'])))#Save the error screenshot
         time.sleep(10)
         self._windowMgr.retake_screenshot()
         self._windowMgr.find_button_coordinates(os.path.join(self.image_directory,image_file))	#path to the image
