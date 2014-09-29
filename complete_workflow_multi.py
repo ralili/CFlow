@@ -1,5 +1,5 @@
 import CFlow,time,threading,logging
-
+'''for multisampling'''
 logging.basicConfig(filename='C:\\Users\\rumarc\\Desktop\\Results\\CFlow_execution.log', level=logging.INFO,filemode='w',format='%(asctime)s %(message)s',datefmt='%Y-%m-%d %H:%M')
 arduinoObject=CFlow.multiOperate_arduino()
 
