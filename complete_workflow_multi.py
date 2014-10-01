@@ -6,16 +6,16 @@ arduinoObject=CFlow.multiOperate_arduino()
 day=2#starting day
 hour=18#starting hour
 minute=20#starting minute
-frequency_sampling=[5,5,5,5]#frequency of cytometer measurements, in minutes
-samples=[21,0,0,0]#number of cytometer measurements in total
-start_sample_well=0
+frequency_sampling=[5,4,7,2]#frequency of cytometer measurements, in minutes
+num_samples=[3,4,3,7]#number of cytometer measurements in total
+starting_well=0
 
-def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_object,samplingObject,starting_well=0):
+def pumping_operation(day,hour,minute,frequency_sampling,num_samples,operate_arduino_object,samplingObject,starting_well=0):
   samplingObject=CFlow.sampleHandling()
   samplingObject.setTimes(folder)
 
   click_object=CFlow.click(sample_counter=starting_well)
-  click_object.set_measuring_times(day,hour,minute,frequency,num_samples)		#Set input correctly. day,hour,minute,frequency,num_samples
+  click_object.set_measuring_times(day,hour,minute,frequency_sampling,num_samples)		#Set input correctly. day,hour,minute,frequency,num_samples
 
   read_fcs_object=CFlow.read_fcs('C:\\Users\\rumarc\\Desktop\\Results','ecoli')
 
@@ -35,4 +35,4 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
     operate_arduino_object.cytometer_to_waste(7)
   return
 
-pumping_operation(day,hour,minute,frequency_sampling,samples,operate_arduino_object,samplingObject,start_sample_well)
+pumping_operation(day,hour,minute,frequency_sampling,num_samples,operate_arduino_object,samplingObject,starting_well)
