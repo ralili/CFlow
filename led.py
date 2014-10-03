@@ -51,6 +51,8 @@ class led:
 		logging.info('all led intensity changes are done!!')
 		return												#This indicates that experiment IS done. Close everything.
 class led_array:
+	'''This class was created to give input to an Arduino, which itself needs to be connected to the micro-controller in charge of
+	controlling the array of LEDs. The Arduino also needs to have the correct code uploaded (LEDcontrol.ino)'''
 	def __init__(self,port='COM5'):
 		self.serial = serial.Serial(port)
 	def setIntensities(self,sample1,sample2,sample3,sample4):
