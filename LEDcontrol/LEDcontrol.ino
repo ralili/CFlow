@@ -1,4 +1,6 @@
 #include<string.h>
+//Arduino sketch to be able to control the LED array and interact with serial inputs to update the LED brightness
+
 // constants won't change. Used here to 
 // set pin numbers:
 const int sclkPin =  15;      // the number of the S clock pin
@@ -7,7 +9,7 @@ const int xlatPin =  14;      // the number of the X lat pin
 const int blankPin =  17;      // the number of the Blank pin
 const int gsclkPin =  18;      // the number of the GS clock pin
 int i=0;                       // counter for the number of cycles to run
-const int cycles=200000;          // number of cycles to run
+//const int cycles=200000;          // number of cycles to run
 
 void setup() {
   
@@ -30,25 +32,20 @@ void setup() {
   digitalWrite(gsclkPin, LOW);
   
   //send initial values to the chip
-  __updateGrayscale(blankPin, sclkPin, xlatPin, "111111111111111111111111111111111111000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
-  
-
-
+  __updateGrayscale(blankPin, sclkPin, xlatPin, "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
 }
-//001111101000001111101000001111101000
-//000000000000000000000000000000000000
-//111111111111111111111111111111111111
-//001111101000001111101000001111101000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+
+
 void loop()
 {
-  if(i<cycles){
+//  if(i<cycles){
       digitalWrite(blankPin, LOW);
     __grayscaleClock(gsclkPin,0.0);
     __runCycle(4094,gsclkPin,0.0);
     __grayscaleClock(gsclkPin,0.0);
     digitalWrite(blankPin, HIGH);
-    i++;
-  }
+//    i++;
+//  }
 
   if(Serial.available()){
     char readChar[12*3*4+1];
