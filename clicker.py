@@ -13,7 +13,7 @@ class click:
         self.sample_counter=sample_counter
         self.image_directory=image_directory
         self.export_counter=0
-    def run(self,image_file="run_button_ready.png"):
+    def run(self,sample_number=0,image_file="run_button_ready.png"):
         """Constructor"""
         self._windowMgr.retake_screenshot()
         try:
@@ -33,11 +33,11 @@ class click:
         self.delete_events()			#delete every 2 seconds, 5 times. Delete the first 10 seconds of measurement.
         if self.checking_end_of_measurements()==1:
             logging.info('measurement %d done',self.time_counter)
-            self.add_sample_well_description()
+            self.add_sample_well_description(sample_number)
             self.save()
         else:
             self.pause_cytometer()
-            self.add_sample_well_description()
+            self.add_sample_well_description(sample_number)
             self.save()
             logging.info('Running cytometer measurements took too long (more 5 minutes). Measurements were paused and proceeding to next step',self.time_counter)
             return
@@ -150,24 +150,33 @@ class click:
                 self.export_counter=0
         else:
             logging.warning('specified paths for Desktop or Output could not be found')
-    def set_measuring_times(self,day,hour,minute,frequency,num_samples):#frequency is in minutes
+    def set_measuring_times(self,day,hour,minute,frequency,num_samples):#frequency is in minutes, and corresponds to a vector, one element for each sample
+        if len(frequency)!=len(num_samples):
+            logging.warning('frequencies and number of samples do not match (error on set_measuring_times)')
+            return
+        if isinstance(num_samples,int):
+            logging.warning('please specify both the number of samples and the frequencies as lists, and not as single numbers (error on set_measuring_times)')
+            return
         self.measuring_times=[]
         time_today=datetime.datetime.now()
         starting_time=datetime.datetime(time_today.year,time_today.month,day,hour,minute,second=0) #User input is only day,hour,minute,second
-        for i in range(num_samples):
-            self.measuring_times.append(starting_time+datetime.timedelta(minutes=frequency*i))
+        for i in range(len(num_samples)):
+            for j in range(num_samples[i]):
+                self.measuring_times.append([starting_time+datetime.timedelta(minutes=frequency[i]*j),i+1])
+        self.measuring_times=sorted(self.measuring_times)
         measuring_times_string='\n'
         for i in self.measuring_times:
             measuring_times_string=measuring_times_string+'  '+str(i)+'\n'
         logging.info('The measuring times will be: %s',measuring_times_string)
     def set_waiting_time(self):
         if len(self.measuring_times)>self.time_counter:
-            self.waiting_time=(self.measuring_times[self.time_counter]-datetime.datetime.now()).total_seconds()
+            self.waiting_time=(self.measuring_times[self.time_counter][0]-datetime.datetime.now()).total_seconds()
             if self.waiting_time<0:
-                logging.warning('timepoint %s already passed. Waiting for the next one'%(str(self.measuring_times[self.time_counter]))) #If timepoint has passed, wait for the next one (or should we just measure right away?)
-                self.time_counter=self.time_counter+1
-                self.sample_counter=self.sample_counter+1
-                self.set_waiting_time()
+                # logging.warning('timepoint %s already passed. Waiting for the next one'%(str(self.measuring_times[self.time_counter]))) #If timepoint has passed, wait for the next one (or should we just measure right away?)
+                # self.time_counter=self.time_counter+1
+                # self.sample_counter=self.sample_counter+1
+                # self.set_waiting_time()
+                self.waiting_time=0
             else:
                 return 0						#This indicates that experiment is NOT done, and that there is a next measurement.
         else:
@@ -208,7 +217,7 @@ class click:
         position=(self._windowMgr._pos[0]+50,self._windowMgr._pos[1]+10) #add position offset
         mouse.move(position[0],position[1])
         mouse.click()
-    def add_sample_well_description(self,image_file="sample_well_description.png"):
+    def add_sample_well_description(self,sample_number=0,image_file="sample_well_description.png"):
         """Constructor"""
         self._windowMgr.retake_screenshot()
         try:
@@ -224,8 +233,12 @@ class click:
         mouse.move(position[0],position[1])
         mouse.click()
         time.sleep(0.5)
+        if sample_number:
+            sampleString=str('sample%i'%sample_number)
+        else:
+            sampleString=''
         sample_time=datetime.datetime.now()
-        sample_time=''.join([str(sample_time.hour),'h',str(sample_time.minute),'m'])
+        sample_time=''.join([sampleString,'time',str(sample_time.hour),'h',str(sample_time.minute),'m'])
         key.type_string(sample_time)
     def button_not_found(self,image_file,image_location='C://Users//rumarc//Desktop//Results'):		#Path where error image is saved needs to be set!!
         """Constructor"""

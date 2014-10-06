@@ -18,6 +18,9 @@ Integral=['Integral']+[m.group(1) for line in res1lines for m in [re.search('Int
 Proportional=['Proportional']+[m.group(1) for line in res1lines for m in [re.search('Proportional parameter value is: ([0-9.-]+)',line)] if m]
 LED=['LED']+[m.group(1) for line in res1lines for m in [re.search('LED signal is: ([0-9.-]+)',line)] if m]
 Time=['Time']+[(i)*10 for i in range(len(GFP)-1)]
+x1=['x1']+[m.group(1) for line in res1lines for m in [re.search('SS hidden states are: \[\[ ?(-?[0-9.]+)',line)] if m]
+x2=['x2']+[m.group(1) for line in res1lines for m in [re.search('SS hidden states are: \[\[ ?-?[0-9.]+\]\],\[\[ ?(-?[0-9.]+)',line)] if m]
+x3=['x3']+[m.group(1) for line in res1lines for m in [re.search('SS hidden states are: \[\[ ?-?[0-9.]+\]\],\[\[ ?-?[ 0-9.]+\]\],\[\[ ?(-?[0-9.]+)',line)] if m]
 
 ##Write information extracted from the log file into a csv file. Csv file is created in the folder where the log file is located.
 csvwriter.writerow(Time)
@@ -26,5 +29,8 @@ csvwriter.writerow(reference)
 csvwriter.writerow(Integral)
 csvwriter.writerow(Proportional)
 csvwriter.writerow(LED)
+csvwriter.writerow(x1)
+csvwriter.writerow(x2)
+csvwriter.writerow(x3)
 
 csvfile.close()

@@ -1,0 +1,29 @@
+#timing:
+- sample 1:
+    air1: 0.6
+    sample: 1
+    pbs1: 7.6
+    pbs2: 1.4
+    air2: 1
+    back sample: 1.4
+- sample 2:
+    air1: 0.6
+    sample: 1
+    pbs1: 7.5
+    pbs2: 1.5
+    air2: 1.25
+    back sample: 1.4
+- sample 3:
+    air1: 0.8
+    sample: 1
+    pbs1: 7.3
+    pbs2: 1.7
+    air2: 1.5
+    back sample: 1.4
+- sample 4:
+    air1: 1
+    sample: 1
+    pbs1: 7.1
+    pbs2: 1.9
+    air2: 1.7
+    back sample: 1.4

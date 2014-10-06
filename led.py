@@ -1,4 +1,4 @@
-import datetime,time,os,csv,logging
+import datetime,time,os,csv,logging,serial
 class led:
 	def __init__(self,operate_arduino_object):
 		self.intensity=[]
@@ -50,3 +50,20 @@ class led:
 		self.operate_arduino_object.operate_led('led2',0)
 		logging.info('all led intensity changes are done!!')
 		return												#This indicates that experiment IS done. Close everything.
+class led_array:
+	'''This class was created to give input to an Arduino, which itself needs to be connected to the micro-controller in charge of
+	controlling the array of LEDs. The Arduino also needs to have the correct code uploaded (LEDcontrol.ino)'''
+	def __init__(self,port='COM5'):
+		self.serial = serial.Serial(port)
+	def setIntensities(self,sample1,sample2,sample3,sample4):
+		lightSignal=''
+		allSamples=([sample1,sample2,sample3,sample4])
+		for individualSamples in reversed(allSamples):
+			for LEDbrightness in reversed(individualSamples):
+				binaryNumber=bin(int(round(LEDbrightness*4095)))[2:]#Get binary number out of light intensity. Should I multiply by another number instead of 4095?
+				binaryNumber='0'*(12-len(binaryNumber))+binaryNumber#Convert to 12-bit number
+				lightSignal+=binaryNumber
+		if self.serial.write(lightSignal)!=144L:
+			logging.warning('error on setIntensities. The light signal given does not have the correct dimensions/format')
+
+		
