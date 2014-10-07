@@ -177,6 +177,7 @@ class click:
                 # self.sample_counter=self.sample_counter+1
                 # self.set_waiting_time()
                 self.waiting_time=0
+                return 0
             else:
                 return 0						#This indicates that experiment is NOT done, and that there is a next measurement.
         else:
