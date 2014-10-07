@@ -4,11 +4,11 @@ logging.basicConfig(filename='C:\\Users\\localadmin\\Desktop\\Results\\CFlow_exe
 operate_arduino_object=CFlow.multiOperate_arduino()
 
 day=7#starting day
-hour=11#starting hour
-minute=20#starting minute
-frequency_sampling=[5,5,0,0]#frequency of cytometer measurements, in minutes
-num_samples=[3,3,0,0]#number of cytometer measurements in total
-starting_well=0
+hour=14#starting hour
+minute=49#starting minute
+frequency_sampling=[6,0,6,6]#frequency of cytometer measurements, in minutes
+num_samples=[2,0,2,2]#number of cytometer measurements in total
+starting_well=72
 
 def pumping_operation(day,hour,minute,frequency_sampling,num_samples,operate_arduino_object,starting_well=0):
   samplingObject=CFlow.sampleHandling()
@@ -23,7 +23,7 @@ def pumping_operation(day,hour,minute,frequency_sampling,num_samples,operate_ard
     logging.info('waiting time until next measurement is: %f',click_object.waiting_time)
     samplingObject.bring_sample(operate_arduino_object,sample=click_object.measuring_times[click_object.time_counter][1])
     click_object.sample()
-    click_object.run()
+    click_object.run(click_object.measuring_times[click_object.time_counter][1])
     click_object.export()
     time.sleep(1)
     click_object.moveFiles('C:\\Users\\localadmin\\Desktop','C:\\Users\\localadmin\\Desktop\\Results')###THIS CHANGES FROM COMPUTER TO COMPUTER. THE OUTPUT FOLDER MUST BE CREATED BEFOREHAND
@@ -31,7 +31,12 @@ def pumping_operation(day,hour,minute,frequency_sampling,num_samples,operate_ard
     ##PERFORM FEEDBACK
     ##
     click_object.backflush()
-    operate_arduino_object.cytometer_to_waste(7)
+    operate_arduino_object.push_to_cytometer(2)
+    operate_arduino_object.cytometer_to_waste(2)
+    operate_arduino_object.push_to_cytometer(2)
+    operate_arduino_object.cytometer_to_waste(2)
+    operate_arduino_object.push_to_cytometer(2)
+    operate_arduino_object.cytometer_to_waste(2)
   return
 
-pumping_operation(day,hour,minute,frequency_sampling,num_samples,operate_arduino_object,samplingObject,starting_well)
+pumping_operation(day,hour,minute,frequency_sampling,num_samples,operate_arduino_object,starting_well)
