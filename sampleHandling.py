@@ -1,8 +1,11 @@
-import yaml,time
+import yaml,time,os
 class sampleHandling:
 	'''class that contains all functions related to bringing the sample from the cell culture to the cytometer. Finds the timings specified by the user and operates the arduino accordingly'''
-	def setTimes(self,folder):
-		with open(folder, 'r') as f:
+	def __init__(self,directory='C:\\Users\\localadmin\\Desktop'):
+		self.directory=directory
+		self.setTimes(self.directory)
+	def setTimes(self,directory):
+		with open(os.path.join(directory,'setTiming.yaml'), 'r') as f:
 			doc = yaml.load(f)
 		self.airTimes1=[]
 		self.sampleTimes=[]
