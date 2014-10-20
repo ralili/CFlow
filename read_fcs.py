@@ -80,7 +80,7 @@ class read_fcs:
 		csvwriter.writerow(self.means)
 		csvwriter.writerow(self.var)
 		csvfile.close()
-	def get_last_data(self,click_object):
+	def get_last_data(self,click_object,output='mean'):
 	#Get normalized mean from last sample taken
 		last_sample=click_object.sample_counter-1
 		letter_list=['A','B','C','D','E','F','G','H']
@@ -91,7 +91,10 @@ class read_fcs:
 		self.extract_data(file_name[0])
 		self.gate()
 		self.normalize()
-		return self.mean_all_fsc
+		if output=='variance':
+			return self.var_all_fsc
+		elif output=='mean':
+			return self.mean_all_fsc
 	def sampleToCSV(self,file_name):
 	#Generate csv file with normalized GFP fluorescence of current data in memory
 		self.extract_data(file_name)
