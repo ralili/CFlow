@@ -252,3 +252,10 @@ class click:
             logging.warning('Image file was still not found. Operation will proceed, skipping this step.')
             return 0
         return 1
+    def organise_into_folders(self,directory):
+        filesToOrganise=[name for name in os.listdir(directory) if re.search('sample(\d+)',name)]
+        foldersToCreate=list(set([re.search('sample(\d+)',name).group(0) for name in filesToOrganise]))       
+		for names in foldersToCreate:
+            os.makedirs(os.path.join(directory,names))
+        for names in filesToOrganise:
+            shutil.copy2(os.path.join(directory,names),os.path.join(directory,re.search('sample(\d+)',names).group(0)))
