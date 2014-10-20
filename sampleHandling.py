@@ -1,8 +1,11 @@
-import yaml,time
+import yaml,time,os
 class sampleHandling:
 	'''class that contains all functions related to bringing the sample from the cell culture to the cytometer. Finds the timings specified by the user and operates the arduino accordingly'''
-	def setTimes(self,folder):
-		with open(folder, 'r') as f:
+	def __init__(self,directory='C:\\Users\\localadmin\\Desktop'):
+		self.directory=directory
+		self.setTimes(self.directory)
+	def setTimes(self,directory):
+		with open(os.path.join(directory,'setTiming.yaml'), 'r') as f:
 			doc = yaml.load(f)
 		self.airTimes1=[]
 		self.sampleTimes=[]
@@ -21,12 +24,16 @@ class sampleHandling:
 		return
 	def bring_sample(self,operate_arduino_object,sample):
 		sample=sample-1
-		operate_arduino_object.operate_pump('pump2','left',speed)
 		operate_arduino_object.air_to_cytometer(self.airTimes1[sample])
 		operate_arduino_object.sample_to_cytometer(sample+1,self.sampleTimes[sample])
-		operate_arduino_object.push_to_cytometer(self.pbsTimes1[sample])
-		time.sleep(2)
-		operate_arduino_object.operate_pump('pump2','left',0)
+		pbs1Time=self.pbsTimes1[sample]/3.
+		operate_arduino_object.push_to_cytometer(pbs1Time)
+		operate_arduino_object.cytometer_to_waste(pbs1Time*1.5)
+		operate_arduino_object.push_to_cytometer(pbs1Time)
+		operate_arduino_object.cytometer_to_waste(pbs1Time)
+		operate_arduino_object.push_to_cytometer(pbs1Time)
+		operate_arduino_object.cytometer_to_waste(pbs1Time*1.5)		
+		time.sleep(1)
 		operate_arduino_object.push_to_cytometer(self.pbsTimes2[sample])
 		operate_arduino_object.air_to_cytometer(self.airTimes2[sample])
 		operate_arduino_object.cytometer_to_sample(sample+1,self.backSampleTimes[sample])
