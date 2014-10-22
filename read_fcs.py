@@ -92,7 +92,11 @@ class read_fcs:
 		self.gate()
 		self.normalize()
 		if output=='variance':
-			return self.var_all_fsc
+			lowerSize=np.percentile(self.GFPnorm_fsc,5)
+			upperSize=np.percentile(self.GFPnorm_fsc,95)
+			crib1=self.GFPnorm_fsc[self.GFPnorm_fsc>lowerSize]
+			crib2=crib1[crib1<upperSize]
+			return np.var(crib2)
 		elif output=='mean':
 			return self.mean_all_fsc
 	def sampleToCSV(self,file_name):
