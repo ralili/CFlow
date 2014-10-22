@@ -43,9 +43,9 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
   ##Feedback constants
   I=0
   P=0
-  kp=0.8*3
-  ki=0.08*3
-  ref=0.66/3									#Reference value for controller
+  kp=6.8
+  ki=0.5
+  ref=0.07									#Reference value for controller
   ##
   while click_object.set_waiting_time()==0:
     time.sleep(click_object.waiting_time)
