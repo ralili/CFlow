@@ -73,7 +73,11 @@ class read_fcs:
 			self.gate()
 			self.normalize()
 			self.means.append(self.mean_all_fsc)
-			self.var.append(self.var_all_fsc)
+			lowerSize=np.percentile(self.GFPnorm_fsc,5)
+			upperSize=np.percentile(self.GFPnorm_fsc,95)
+			crib1=self.GFPnorm_fsc[self.GFPnorm_fsc>lowerSize]
+			crib2=crib1[crib1<upperSize]
+			self.var.append(np.var(crib2))
 		csvfile=open(os.path.join(self.folder,'results.csv'),'w+')
 		csvwriter = csv.writer(csvfile, dialect='excel')
 		csvwriter.writerow(files)
