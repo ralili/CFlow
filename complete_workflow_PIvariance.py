@@ -3,11 +3,11 @@ import CFlow,time,threading,logging
 logging.basicConfig(filename='C:\\Users\\rumarc\\Desktop\\Results\\CFlow_execution.log', level=logging.INFO,filemode='w',format='%(asctime)s %(message)s',datefmt='%Y-%m-%d %H:%M')
 operate_arduino_object=CFlow.operate_arduino()
 
-day=21#starting day
-hour=11#starting hour
-minute=15#starting minute
+day=24#starting day
+hour=18#starting hour
+minute=10#starting minute
 frequency_sampling=10#frequency of cytometer measurements, in minutes
-samples=48#number of cytometer measurements in total
+samples=57#number of cytometer measurements in total
 frequency_light=3600#frequency of led changes, in seconds
 start_sample_well=0
 
@@ -60,8 +60,16 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
     ##PERFORM FEEDBACK
     GFP_variance=read_fcs_object.get_last_data(click_object,'variance')
     logging.info('GFP variance is: %f',GFP_variance)
+    if GFP_variance>ref:
+        kp=13.6
+        ki=1.5
+    if GFP_variance<ref*0.9:
+        kp=6.8
+        ki=0.5
     print(GFP_variance)
     I=ki*(ref-GFP_variance)+I
+    if I<0:
+        I=0
     print(I)
     logging.info('Integral parameter value is: %f',I)
     P=kp*(ref-GFP_variance)
@@ -81,19 +89,4 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
     operate_arduino_object.cytometer_to_waste(8)
   return
 
-def led_operation(day,hour,minute,frequency,operate_arduino_object):#frequency is in seconds
-  led=CFlow.led(operate_arduino_object)
-  led.read_intensity_file(folder_path='C:\\Users\\rumarc\\Desktop\\Results',file_name='intensities.csv')			##ADD FOLDER
-  led.scale_intensities()
-  led.set_change_times(day,hour,minute,frequency)
-  led.led_guide()
-  return
-
-
-
-
-thread1=threading.Thread(target=pumping_operation, args = (day,hour,minute,frequency_sampling,samples,operate_arduino_object,start_sample_well))
-thread1.start()
-
-#thread2=threading.Thread(target=led_operation, args = (day,hour,minute,frequency_light,operate_arduino_object))
-#thread2.start()
+pumping_operation(day,hour,minute,frequency_sampling,samples,operate_arduino_object,start_sample_well)
