@@ -49,6 +49,7 @@ class read_fcs:
 			ingate = (3*(np.log10(self.FSC_A)-center[0])**2+0.5*(np.log10(self.SSC_A)-center[1]))**2<0.1
 			ingate = ingate*(self.GFP>800)
 			self.FSC_H=self.data[ingate,6]
+			self.SSC_H=self.data[ingate,7]
 			self.FSC_A=self.data[ingate,0]
 			self.SSC_A=self.data[ingate,1]
 			self.GFP= self.data[ingate,2]##FL1_A
