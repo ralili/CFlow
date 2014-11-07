@@ -46,7 +46,7 @@ class read_fcs:
 			self.GFP=self.data[ingate,2]##FL1_A
 		elif self.cell_type=='ecoli' or self.cell_type==1:
 			center = np.array([4.3,3.3])
-			ingate = (3*(np.log10(self.FSC_A)-center[0])**2+0.5*(np.log10(self.SSC_A)-center[1]))**2<0.1
+			ingate = (3*(np.log10(self.FSC_A)-center[0])**2+0.5*(np.log10(self.SSC_A)-center[1])**2)<0.1
 			ingate = ingate*(self.GFP>800)
 			self.FSC_H=self.data[ingate,6]
 			self.SSC_H=self.data[ingate,7]
@@ -113,6 +113,66 @@ class read_fcs:
 		csvwriter = csv.writer(csvfile, dialect='excel')
 		csvwriter.writerow(self.GFPnorm_fsc)
 		csvfile.close()
+	def printMetrics(self):
+		files = [ f for f in os.listdir(self.folder) if (os.path.isfile(os.path.join(self.folder,f)) and f[-4:]=='.fcs')]
+		unNormVar=[]
+		NormVar=[]
+		meanFSC=[]
+		varFSC=[]
+		MAD=[]
+		median=[]
+		means=[]
+		for f in files:
+			self.extract_data(f)
+			self.gate()
+			self.normalize()
+			means.append(self.mean_all_fsc)
+			##
+			meanFSC.append(np.mean(self.FSC_H.astype(float)))
+			##
+			median.append(np.median(self.GFP.astype(float)))
+			##
+			lowerSize=np.percentile(self.FSC_H.astype(float),5)
+			upperSize=np.percentile(self.FSC_H.astype(float),95)
+			cribSize1=self.FSC_H.astype(float)[self.FSC_H.astype(float)>lowerSize]
+			cribSize2=cribSize1[cribSize1<upperSize]
+			varFSC.append(np.var(cribSize2))
+			##
+			lowerGFP=np.percentile(self.GFP.astype(float),5)
+			upperGFP=np.percentile(self.GFP.astype(float),95)
+			cribGFP1=self.GFP.astype(float)[self.GFP.astype(float)>lowerGFP]
+			cribGFP2=cribGFP1[cribGFP1<upperGFP]
+			unNormVar.append(np.var(cribGFP2))
+			##
+			lowerGFP=np.percentile(self.GFP.astype(float)/self.FSC_H.astype(float),5)
+			upperGFP=np.percentile(self.GFP.astype(float)/self.FSC_H.astype(float),95)
+			cribGFP1=(self.GFP.astype(float)/self.FSC_H.astype(float))[self.GFP.astype(float)>lowerGFP]
+			cribGFP2=cribGFP1[cribGFP1<upperGFP]
+			NormVar.append(np.var(cribGFP2))
+			##
+			MAD.append(np.median(abs(self.GFP.astype(float)-np.median(self.GFP.astype(float)))))
+		csvfile=open(os.path.join(self.folder,'metrics.csv'),'w+')
+		csvwriter = csv.writer(csvfile, dialect='excel')
+		csvwriter.writerow(files)
+		csvwriter.writerow(means)
+		csvwriter.writerow(NormVar)
+		csvwriter.writerow(meanFSC)
+		csvwriter.writerow(median)
+		#csvwriter.writerow(varFSC)
+		#csvwriter.writerow(MAD)
+		csvfile.close()
+	def printFCS(self):
+		files = [ f for f in os.listdir(self.folder) if (os.path.isfile(os.path.join(self.folder,f)) and f[-4:]=='.fcs')]
+		for f in files:
+			self.extract_data(f)
+			#  self.gate()
+			csvfile=open(os.path.join(self.folder,('%s.csv'%f[0:-4])),'w+')
+			csvwriter = csv.writer(csvfile, dialect='excel')
+			csvwriter.writerow(self.GFP)
+			csvwriter.writerow(self.FSC_H)
+			csvwriter.writerow(self.SSC_H)
+			csvwriter.writerow(self.FSC_A)
+			csvwriter.writerow(self.SSC_A)
 
 #available channels: ['FSC-A', 'SSC-A', 'FL1-A', 'FL2-A', 'FL3-A', 'FL4-A', 'FSC-H', 'SSC-H', 'FL1-H', 'FL2-H', 'FL3-H', 'FL4-H', 'Width', 'Time']
 
