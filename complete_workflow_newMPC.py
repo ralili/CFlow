@@ -4,11 +4,11 @@ import numpy as np
 logging.basicConfig(filename='C:\\Users\\rumarc\\Desktop\\Results\\CFlow_execution.log', level=logging.INFO,filemode='w',format='%(asctime)s %(message)s',datefmt='%Y-%m-%d %H:%M')
 operate_arduino_object=CFlow.operate_arduino()
 
-day=28#starting day
-hour=17#starting hour
+day=12#starting day
+hour=11#starting hour
 minute=37#starting minute
 frequency_sampling=10#frequency of cytometer measurements, in minutes
-samples=21#number of cytometer measurements in total
+samples=31#number of cytometer measurements in total
 frequency_light=3600#frequency of led changes, in seconds
 start_sample_well=0
 
@@ -43,8 +43,8 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
   operate_arduino_object.operate_led(2,0*256)####
   ##controller setup
   controller=CFlow.newMPC(10)
-  reference=np.zeros(shape=(1,(num_samples+6)))+0.66
   LED_signal=0
+  LED_signalTransformed=0
   ####Need to add something to subtract initial offset from data!!!
   ##
   cycle=0
@@ -64,8 +64,9 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
     print(GFP_mean)
     if cycle==0:
       controller.initialGFPreading=GFP_mean
-    controller.kalmanFilter(LED_signal,GFP_mean/controller.initialGFPreading)
-    LED_signalTransformed=controller.multiPrediction(reference[0][cycle:cycle+5]/controller.initialGFPreading)
+      reference=np.zeros(shape=(1,(num_samples+6)))+4
+    controller.kalmanFilter(LED_signalTransformed,GFP_mean/controller.initialGFPreading)
+    LED_signalTransformed=controller.multiPrediction(reference[0][cycle:cycle+5])
     LED_signal=controller.ledOutputTransformation(LED_signalTransformed)
     if LED_signal>1:
         LED_signal=1
@@ -81,13 +82,4 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
     cycle+=1
   return
 
-def led_operation(day,hour,minute,frequency,operate_arduino_object):#frequency is in seconds
-  led=CFlow.led(operate_arduino_object)
-  led.read_intensity_file(folder_path='C:\\Users\\rumarc\\Desktop\\Results',file_name='intensities.csv')			##ADD FOLDER
-  led.scale_intensities()
-  led.set_change_times(day,hour,minute,frequency)
-  led.led_guide()
-  return
-
-thread1=threading.Thread(target=pumping_operation, args = (day,hour,minute,frequency_sampling,samples,operate_arduino_object,start_sample_well))
-thread1.start()
+pumping_operation(day,hour,minute,frequency_sampling,samples,operate_arduino_object,start_sample_well)
