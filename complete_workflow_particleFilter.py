@@ -47,6 +47,7 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
   ##Start up Matlab
   matlab = matlab_wrapper.MatlabSession()
   matlab.eval("parpool")
+  matlab.eval("cd('C:\\Users\\localadmin\\Desktop\\Particle Filter')")
   ##Controller setup
   P=1000#number of particles
   MPChorizon=3#number of steps that the MPC looks ahead for the optimization
@@ -76,7 +77,7 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
     if cycle==0:
       initialGFPreading=GFP_mean
     GFP_measurements.append(GFP_mean/initialGFPreading)
-    matlabCommand="LED=MPCloop(%i,%i,%i,%i,%s,%s)"%(cycle+2,P,frequency,MPChorizon,str(GFP_measurements),str(reference))#!!!
+    matlabCommand="LED=MPC_loop(%i,%i,%i,%i,%s,%s)"%(cycle+2,P,frequency,MPChorizon,str(GFP_measurements),str(reference))#!!!
     matlab.eval(matlabCommand)
     LED_signalTransformed=matlab.get('LED')
     LED_signal=np.log(a/(b*(LEDintensity-d))-1/b)/(c*100)
