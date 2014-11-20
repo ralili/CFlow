@@ -5,8 +5,8 @@ logging.basicConfig(filename='C:\\Users\\localadmin\\Desktop\\Results\\CFlow_exe
 operate_arduino_object=CFlow.operate_arduino()
 
 day=20#starting day
-hour=11#starting hour
-minute=37#starting minute
+hour=12#starting hour
+minute=4#starting minute
 frequency_sampling=10#frequency of cytometer measurements, in minutes
 samples=31#number of cytometer measurements in total
 frequency_light=3600#frequency of led changes, in seconds
@@ -49,10 +49,10 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
   matlab.eval("parpool")
   matlab.eval("cd('C:\\Users\\localadmin\\Desktop\\Particle Filter')")
   ##Controller setup
-  P=1000#number of particles
+  P=5000#number of particles
   MPChorizon=3#number of steps that the MPC looks ahead for the optimization
-  reference=[3,]*(num_samples+MPChorizon)
-  GFP_measurements=[]
+  reference=[4,]*(num_samples+MPChorizon)
+  GFP_measurements=[1]
   LEDapplied=[0]#Needs to be from 0 to 4.5!!
   ##Dose-response Sigmoidal
   a=5.828
@@ -81,13 +81,14 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
     matlabCommand="LED=MPC_loop(%i,%i,%i,%s,%s,%s)"%(P,frequency,MPChorizon,str(GFP_measurements),str(reference),str(LEDapplied))#!!!Don't apply on the first cycle.
     matlab.eval(matlabCommand)
     LED_signalTransformed=matlab.get('LED')
-    LED_signal=np.log(a/(b*(LEDintensity-d))-1/b)/(c*100)
+    LEDapplied.append(LED_signalTransformed)
+    LED_signal=np.log(a/(b*(LED_signalTransformed-d))-1/b)/(c*100)
     if LED_signal>1:
         LED_signal=1
     elif LED_signal<0:
         LED_signal=0
     logging.info('LED signal is: %f',LED_signal)
-    logging.info('reference is: %f',reference[0][cycle])
+    logging.info('reference is: %f',reference[cycle])
     print(LED_signal)
     operate_arduino_object.operate_led(2,LED_signal*256)
 	##
