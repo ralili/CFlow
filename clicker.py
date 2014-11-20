@@ -150,27 +150,42 @@ class click:
                 self.export_counter=0
         else:
             logging.warning('specified paths for Desktop or Output could not be found')
-    def set_measuring_times(self,day,hour,minute,frequency,num_samples):#frequency is in minutes, and corresponds to a vector, one element for each sample
-        if len(frequency)!=len(num_samples):
-            logging.warning('frequencies and number of samples do not match (error on set_measuring_times)')
-            return
-        if isinstance(num_samples,int):
-            logging.warning('please specify both the number of samples and the frequencies as lists, and not as single numbers (error on set_measuring_times)')
-            return
-        self.measuring_times=[]
-        time_today=datetime.datetime.now()
-        starting_time=datetime.datetime(time_today.year,time_today.month,day,hour,minute,second=0) #User input is only day,hour,minute,second
-        for i in range(len(num_samples)):
-            for j in range(num_samples[i]):
-                self.measuring_times.append([starting_time+datetime.timedelta(minutes=frequency[i]*j),i+1])
-        self.measuring_times=sorted(self.measuring_times)
-        measuring_times_string='\n'
-        for i in self.measuring_times:
-            measuring_times_string=measuring_times_string+'  '+str(i)+'\n'
-        logging.info('The measuring times will be: %s',measuring_times_string)
-    def set_waiting_time(self):
+    def set_measuring_times(self,day,hour,minute,frequency,num_samples,multi=False):#frequency is in minutes, and corresponds to a vector, one element for each sample
+        if multi==True:
+            if len(frequency)!=len(num_samples):
+                logging.warning('frequencies and number of samples do not match (error on set_measuring_times)')
+                return
+            if isinstance(num_samples,int):
+                logging.warning('please specify both the number of samples and the frequencies as lists, and not as single numbers (error on set_measuring_times)')
+                return
+            self.measuring_times=[]
+            time_today=datetime.datetime.now()
+            starting_time=datetime.datetime(time_today.year,time_today.month,day,hour,minute,second=0) #User input is only day,hour,minute,second
+            for i in range(len(num_samples)):
+                for j in range(num_samples[i]):
+                    self.measuring_times.append([starting_time+datetime.timedelta(minutes=frequency[i]*j),i+1])
+            self.measuring_times=sorted(self.measuring_times)
+            measuring_times_string='\n'
+            for i in self.measuring_times:
+                measuring_times_string=measuring_times_string+'  '+str(i)+'\n'
+            logging.info('The measuring times will be: %s',measuring_times_string)
+        else:
+            self.measuring_times=[]
+            time_today=datetime.datetime.now()
+            starting_time=datetime.datetime(time_today.year,time_today.month,day,hour,minute,second=0) #User input is only day,hour,minute,second
+            for i in range(num_samples):
+                self.measuring_times.append(starting_time+datetime.timedelta(minutes=frequency*i))
+            measuring_times_string='\n'
+            for i in self.measuring_times:
+                measuring_times_string=measuring_times_string+'  '+str(i)+'\n'
+            logging.info('The measuring times will be: %s',measuring_times_string)            
+           
+    def set_waiting_time(self,multi=False):
         if len(self.measuring_times)>self.time_counter:
-            self.waiting_time=(self.measuring_times[self.time_counter][0]-datetime.datetime.now()).total_seconds()
+            if multi==True:
+                self.waiting_time=(self.measuring_times[self.time_counter][0]-datetime.datetime.now()).total_seconds()
+            else:
+                self.waiting_time=(self.measuring_times[self.time_counter]-datetime.datetime.now()).total_seconds()
             if self.waiting_time<0:
                 # logging.warning('timepoint %s already passed. Waiting for the next one'%(str(self.measuring_times[self.time_counter]))) #If timepoint has passed, wait for the next one (or should we just measure right away?)
                 # self.time_counter=self.time_counter+1
@@ -256,7 +271,7 @@ class click:
     def organise_into_folders(self,directory):
         filesToOrganise=[name for name in os.listdir(directory) if re.search('sample(\d+)',name)]
         foldersToCreate=list(set([re.search('sample(\d+)',name).group(0) for name in filesToOrganise]))       
-		for names in foldersToCreate:
+        for names in foldersToCreate:
             os.makedirs(os.path.join(directory,names))
         for names in filesToOrganise:
             shutil.copy2(os.path.join(directory,names),os.path.join(directory,re.search('sample(\d+)',names).group(0)))
