@@ -1,10 +1,10 @@
 import CFlow,time,logging,matlab_wrapper
 import numpy as np
 
-logging.basicConfig(filename='C:\\Users\\rumarc\\Desktop\\Results\\CFlow_execution.log', level=logging.INFO,filemode='w',format='%(asctime)s %(message)s',datefmt='%Y-%m-%d %H:%M')
+logging.basicConfig(filename='C:\\Users\\localadmin\\Desktop\\Results\\CFlow_execution.log', level=logging.INFO,filemode='w',format='%(asctime)s %(message)s',datefmt='%Y-%m-%d %H:%M')
 operate_arduino_object=CFlow.operate_arduino()
 
-day=12#starting day
+day=20#starting day
 hour=11#starting hour
 minute=37#starting minute
 frequency_sampling=10#frequency of cytometer measurements, in minutes
@@ -38,7 +38,7 @@ def bring_sample(operate_arduino_object):
 def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_object,starting_well=0):
   click_object=CFlow.click(sample_counter=starting_well)
   click_object.set_measuring_times(day,hour,minute,frequency,num_samples)		#Set input correctly. day,hour,minute,frequency,num_samples
-  read_fcs_object=CFlow.read_fcs('C:\\Users\\rumarc\\Desktop\\Results','ecoli')
+  read_fcs_object=CFlow.read_fcs('C:\\Users\\localadmin\\Desktop\\Results','ecoli')
   ##Initial light conditions
   LED_signal=0#initial green light
   LED_signalTransformed=0
@@ -53,6 +53,7 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
   MPChorizon=3#number of steps that the MPC looks ahead for the optimization
   reference=[3,]*(num_samples+MPChorizon)
   GFP_measurements=[]
+  LEDapplied=[0]#Needs to be from 0 to 4.5!!
   ##Dose-response Sigmoidal
   a=5.828
   b=3.353
@@ -68,7 +69,7 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
     click_object.run()
     click_object.export()
     time.sleep(1)
-    click_object.moveFiles('C:\\Users\\rumarc\\Desktop','C:\\Users\\rumarc\\Desktop\\Results')###THIS CHANGES FROM COMPUTER TO COMPUTER. THE OUTPUT FOLDER MUST BE CREATED BEFOREHAND
+    click_object.moveFiles('C:\\Users\\localadmin\\Desktop','C:\\Users\\localadmin\\Desktop\\Results')###THIS CHANGES FROM COMPUTER TO COMPUTER. THE OUTPUT FOLDER MUST BE CREATED BEFOREHAND
     time.sleep(1)
     ##PERFORM CONTTROL
     GFP_mean=read_fcs_object.get_last_data(click_object)
@@ -77,7 +78,7 @@ def pumping_operation(day,hour,minute,frequency,num_samples,operate_arduino_obje
     if cycle==0:
       initialGFPreading=GFP_mean
     GFP_measurements.append(GFP_mean/initialGFPreading)
-    matlabCommand="LED=MPC_loop(%i,%i,%i,%i,%s,%s)"%(cycle+2,P,frequency,MPChorizon,str(GFP_measurements),str(reference))#!!!
+    matlabCommand="LED=MPC_loop(%i,%i,%i,%s,%s,%s)"%(P,frequency,MPChorizon,str(GFP_measurements),str(reference),str(LEDapplied))#!!!Don't apply on the first cycle.
     matlab.eval(matlabCommand)
     LED_signalTransformed=matlab.get('LED')
     LED_signal=np.log(a/(b*(LEDintensity-d))-1/b)/(c*100)
